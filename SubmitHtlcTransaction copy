@@ -1,0 +1,109 @@
+package algorandprogram.test;
+import com.algorand.algosdk.account.Account;
+import com.algorand.algosdk.algod.client.AlgodClient;
+import com.algorand.algosdk.algod.client.ApiException;
+import com.algorand.algosdk.algod.client.api.AlgodApi;
+import com.algorand.algosdk.algod.client.auth.ApiKeyAuth;
+import com.algorand.algosdk.algod.client.model.*;
+import com.algorand.algosdk.crypto.Address;
+import com.algorand.algosdk.crypto.Digest;
+import com.algorand.algosdk.crypto.LogicsigSignature;
+import com.algorand.algosdk.templates.ContractTemplate;
+import com.algorand.algosdk.templates.HTLC;
+import com.algorand.algosdk.transaction.SignedTransaction;
+import com.algorand.algosdk.transaction.Transaction;
+import com.algorand.algosdk.util.Encoder;
+
+import java.math.BigInteger;
+import java.util.ArrayList;
+
+/**
+ * Sign and Submit a transaction example using HTLC
+ *
+ */
+public class SubmitHtlcTransaction
+{
+    public static void main(String args[]) throws Exception {
+        // Setup conection parameters
+        final String ALGOD_API_ADDR = "https://api.testnet.algoexplorer.io";
+        final int ALGOD_PORT = 443;
+        final String ALGOD_API_TOKEN = "3D4YHZ7Scg3Ucg5sMA8xl8NghVCpeoRT7f3NNk3I";
+        // Instaniate the algod wrappe
+        AlgodClient client = (AlgodClient) new AlgodClient().setBasePath(ALGOD_API_ADDR);
+        ApiKeyAuth api_key = (ApiKeyAuth) client.getAuthentication("api_key");
+        api_key.setApiKey(ALGOD_API_TOKEN);
+        AlgodApi algodApiInstance = new AlgodApi(client);
+
+        // get last round and suggested tx fee
+        BigInteger firstRound = BigInteger.valueOf(301);
+        String genId = null;
+        Digest genesisHash = null;
+        BigInteger expiryRound = BigInteger.valueOf(0);
+        try {
+            // Get suggested parameters from the node
+            TransactionParams params = algodApiInstance.transactionParams();
+            firstRound = params.getLastRound();
+            genId = params.getGenesisID();
+            genesisHash = new Digest(params.getGenesishashb64());
+            firstRound = params.getLastRound();
+            expiryRound = 1;
+
+        } catch (ApiException e) {
+            System.err.println("Exception when calling algod#transactionParams");
+            e.printStackTrace();
+        }
+
+        // Inputs to the Template
+        int maxFee = 2000;
+        Address owner = new Address("DVJ6M4SRCZW3VTUUKSZYP3JLQS7UFJAJ4O45ARANL2HXV3RRY6YFDIAHE4");
+        Address receiver = new Address("I5RBEV7YXFWX6IONZWH5KPRSQAZZ7HKWBFSSYSDH5IALQSYOKJKP5UH2MQ");
+        String hashFn = "sha256";
+        String hashImg = "QzYhq9JlYbn2QdOMrhyxVlNtNjeyvyJc/I8d8VAGfGc=";
+        // Instantiate the templates
+        ContractTemplate result = HTLC.MakeHTLC(owner, receiver, hashFn, hashImg, expiryRound.intValue(), maxFee);        
+
+        // Get the program and parameters and use them to create an lsig
+        // For the contract account to be used in a transaction
+        // In this example 'hero wisdom green split loop element vote belt' 
+        // hashed with sha256 will produce our image hash
+        // This is the passcode for the HTLC  
+        BigInteger amount = BigInteger.valueOf(0);
+        BigInteger lastRound = firstRound.add(BigInteger.valueOf(1000));
+
+        ArrayList<byte[]> pargs = new ArrayList<byte[]>();
+        byte[] arg1 = "hero wisdom green split loop element vote belt".getBytes();
+        // byte[] arg2 = {4, 5, 6};
+        pargs.add(arg1);
+        System.out.println("program: " + result.program.toString());
+        LogicsigSignature lsig = new LogicsigSignature(result.program, pargs);
+        // Print out the contract address
+        // if you are debugging this complete example
+        // be sure to add a break point after you have the contract address
+        // before submitting the transaction, so you can fund it using the dispenser
+        System.out.println("Contract address: " + lsig.toAddress().toString());
+
+        // Create a Transaction
+        Address zeroAddress = new Address("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAY5HFKQ");
+        Transaction tx = Transaction.PaymentTransactionBuilder()
+                .sender(lsig.toAddress())
+                .closeRemainderTo(receiver)
+                .receiver(zeroAddress)
+                .flatFee(1000)
+                .amount(0)
+                .firstValid(firstRound)
+                .lastValid(lastRound)
+                .genesisHash(genesisHash)
+                .build(); 
+        try {
+            // Create a signed transaction with logicSig
+            SignedTransaction stx = Account.signLogicsigTransaction(lsig, tx);
+
+            byte[] encodedTxBytes = Encoder.encodeToMsgPack(stx);
+            TransactionID id = algodApiInstance.rawTransaction(encodedTxBytes);
+            System.out.println("Successfully sent tx with id: " + id);
+        } catch (ApiException e) {
+            // This is generally expected, but should give us an informative error message.
+            System.err.println("Exception when calling algod#rawTransaction: " + e.getResponseBody());
+        }
+    }
+}
