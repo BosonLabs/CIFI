@@ -1,0 +1,105 @@
+package com.algorandprogram.javatest.test;
+
+import com.java.math.BigInteger;
+import com.algorand.algosdk.v2.client.common.AlgodClient;
+import com.algorand.algosdk.account.Account;
+import com.algorand.algosdk.v2.client.model.*;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import com.algorand.algosdk.v2.client.common.*;
+import com.algorand.algosdk.algod.client.ApiException;
+import com.algorand.algosdk.transaction.SignedTransaction;
+import com.algorand.algosdk.transaction.Transaction;
+
+// Show Creating, modifying, sending and listing assets
+public class App {
+    public AlgodClient client = null;
+
+    // utility function to connect to a node
+    private AlgodClient connectToNetwork() {
+        final String ALGOD_API_ADDR = "localhost";
+        final int ALGOD_PORT = 4001;
+        final String ALGOD_API_TOKEN = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+        AlgodClient client = new AlgodClient(ALGOD_API_ADDR, ALGOD_PORT, ALGOD_API_TOKEN);
+        return client;
+    }
+
+    // utility function to print created asset
+    public void printCreatedAsset(Account account, Long assetID) throws Exception {
+        if (client == null)
+            this.client = connectToNetwork();
+        String accountInfo = client.AccountInformation(account.getAddress()).execute().toString();
+        JSONObject jsonObj = new JSONObject(accountInfo.toString());
+        JSONArray jsonArray = (JSONArray) jsonObj.get("created-assets");
+        if (jsonArray.length() > 0)
+            try {
+                for (Object o : jsonArray) {
+                    JSONObject ca = (JSONObject) o;
+                    Integer myassetIDInt = (Integer) ca.get("index");
+                    if (assetID.longValue() == myassetIDInt.longValue()) {
+                        System.out.println("Created Asset Info: " + ca.toString(2)); // pretty print
+                        break;
+                    }
+                }
+            } catch (Exception e) {
+                throw (e);
+            }
+    }
+
+    // utility function to print asset holding
+    public void printAssetHolding(Account account, Long assetID) throws Exception {
+        if (client == null)
+            this.client = connectToNetwork();
+        String accountInfo = client.AccountInformation(account.getAddress()).execute().toString();
+        JSONObject jsonObj = new JSONObject(accountInfo.toString());
+        JSONArray jsonArray = (JSONArray) jsonObj.get("assets");
+        if (jsonArray.length() > 0)
+            try {
+                for (Object o : jsonArray) {
+                    JSONObject ca = (JSONObject) o;
+                    Integer myassetIDInt = (Integer) ca.get("asset-id");
+                    if (assetID.longValue() == myassetIDInt.longValue()) {
+                        System.out.println("Asset Holding Info: " + ca.toString(2)); // pretty print
+                        break;
+                    }
+                }
+            } catch (Exception e) {
+                throw (e);
+            }
+    }
+
+    // utility function to wait on a transaction to be confirmed
+    public void waitForConfirmation(String txID) throws Exception {
+        if (client == null)
+            this.client = connectToNetwork();
+        Long lastRound = client.GetStatus().execute().body().lastRound;
+        while (true) {
+            try {
+                // Check the pending tranactions
+                Response<PendingTransactionResponse> pendingInfo = client.PendingTransactionInformation(txID).execute();
+                if (pendingInfo.body().confirmedRound != null && pendingInfo.body().confirmedRound > 0) {
+                    // Got the completed Transaction
+                    System.out.println(
+                            "Transaction " + txID + " confirmed in round " + pendingInfo.body().confirmedRound);
+                    break;
+                }
+                lastRound++;
+                client.WaitForBlock(lastRound).execute();
+            } catch (Exception e) {
+                throw (e);
+            }
+        }
+    }
+
+    // Utility function for sending a raw signed transaction to the network
+    public String submitTransaction(SignedTransaction signedTx) throws Exception {
+        try {
+            // Msgpack encode the signed transaction
+            byte[] encodedTxBytes = Encoder.encodeToMsgPack(signedTx);
+            String id = client.RawTransaction().rawtxn(encodedTxBytes).execute().body().txId;
+
+            return (id);
+        } catch (ApiException e) {
+            throw (e);
+        }
+    }
