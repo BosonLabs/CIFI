@@ -1,0 +1,23 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "npm",
+			"script": "build",
+			"path": "AlgorandWebApp/",
+			"group": "build",
+			"problemMatcher": [],
+			"label": "npm: build - AlgorandWebApp",
+			"detail": "react-scripts build"
+		},
+		{
+			"type": "npm",
+			"script": "build",
+			"path": "WebApp/NFTWebAPP/",
+			"group": "build",
+			"problemMatcher": [],
+			"label": "npm: build - WebApp/NFTWebAPP",
+			"detail": "react-scripts build"
+		}
+	]
+}
