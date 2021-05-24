@@ -196,6 +196,9 @@ const buynow= async(a) =>{
   //bnb 0x2cA1655cceB43D27027e6676E880D1Ce4e7d7d18
     let gettrans=new web3.eth.Contract(tra,'0x2cA1655cceB43D27027e6676E880D1Ce4e7d7d18');
 
+
+    alert("checking abi con address  "+tra+"  "+ gettrans);
+
     //let gettrans=new web3.eth.Contract(tra,a.addOwnerAddress);
 
     let getaaa=new web3.eth.Contract(abi,a.addcAdd);
@@ -468,6 +471,18 @@ const buynow= async(a) =>{
                 onClick= {connectmm}>
                Connect wallet
               </button>
+              {" "}
+
+              <Link
+              to="/testing">
+              <button
+                class="btn btn-info btn-block"
+                type="button"
+                // 
+              >
+               Testing
+              </button>              
+              </Link>
               {" "}
 {/* <h2>Welcome</h2> */}
 <button onClick={handleLogout}>Logout</button>
