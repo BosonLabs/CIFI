@@ -187,6 +187,8 @@ const setprice =async ()=>{
 
             console.log(`a`, a)
             let getaaaa=new web3.eth.Contract(abi,a.addcAdd);
+            alert("con address"+a.addcAdd);
+            alert("token id"+isd);
             const accounts = await  web3.eth.getAccounts();
             console.log("checking")
             
@@ -196,7 +198,12 @@ const setprice =async ()=>{
             if(accounts[0] === a.addAddress)
             {
 
-              await getaaaa.methods.setTokenState([isd],"true").send({from:accounts[0]});
+              //change mactimum
+              await getaaaa.methods.setTokenState([isd],"true").send({
+                from:accounts[0],
+                gas: 51753,
+                gasPrice:'10000000000'
+              });
            // salepage.settokenstate();
             await getaaaa.methods.setTokenPrice([isd],price).send({from:accounts[0]})
             const priceamount = await getaaaa.methods.items(isd).call();
@@ -256,25 +263,39 @@ const send=async()=>{
     alert("you are entered owner address so you does not send this address")
 
   }else{
+//eth
+    // await getaaaa.methods.safeTransferFrom(accounts[0],toaddressget,a.addIds).send({
+    //   from:accounts[0]
 
-    await getaaaa.methods.safeTransferFrom(accounts[0],toaddressget,a.addIds).send({
-      from:accounts[0]
-    });
+    // });
+
+    //mactimum
+    // await getaaaa.methods.safeTransferFrom(accounts[0],toaddressget,a.addIds).send({
+    //   from:accounts[0],
+    //      gas: 117218,
+    //      gasPrice:'5000000000'
+    // });
+//also mactimum
+
   
-    console.log("checkinga",a.addOwnerAddress)
 
+await getaaaa.methods.transferFrom(accounts[0],toaddressget,a.addIds).send({
+  from:accounts[0]
+});  
+    console.log("checkinga",a.addOwnerAddress)
 
     let refsellers=fireDb.database().ref(`buyerssavedb/${accounts[0]}`);//.child(a.addKeyI);//ref1
     const keysellers = refsellers.push().key;
   
+    //alert("get"+a.addPrices);
   
     refsellers.child(keysellers).set({
-      id:a.addIds,imageUrl:a.addImgs,priceSet:a.price,cAddress:a.addcAdd,keyId:a.addKeyI,userName:a.addName,userSymbol:a.addSymbol,ipfsUrl:a.addIpfs,ownerAddress:accounts[0],
+      id:a.addIds,imageUrl:a.addImgs,priceSet:a.addPrices,cAddress:a.addcAdd,keyId:a.addKeyI,userName:a.addName,userSymbol:a.addSymbol,ipfsUrl:a.addIpfs,ownerAddress:accounts[0],
       soldd:"",extra1:"readytosold",datesets:new Date().toDateString(),whois:'Buyers'
     })
-  
+
     
-    
+
       fireDb.database().ref(`imageref/${toaddressget}`).child(a.addKeyI).update({
         id:a.addIds,imageUrl:a.addImgs,priceSet:a.addPrices,cAddress:a.addcAdd,keyId:a.addKeyI,userName:a.addName,
         userSymbol:a.addSymbol,ipfsUrl:a.addIpfs,ownerAddress:toaddressget,soldd:"sended",extra1:"buyed",addPoAddress:accounts[0],
@@ -707,7 +728,6 @@ return (
 
 
 </div>
-
 
 <div style={{backgroundColor:'white',height:'150px',width:'1500px',marginBlock:'5px',display:'flex',marginLeft:'2px'}} >
 
