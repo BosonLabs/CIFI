@@ -1,5 +1,5 @@
 import moment from 'moment';
-import React, { useState,useEffect } from "react";
+import React, { useState,useEffect,useCallback } from "react";
 //import history from "./utils/history";
 import web3 from './web3';
 // Router, Route, Switch,
@@ -28,6 +28,10 @@ import Logo from './logo.svg';
 
 import "./App.css"
 import DarkMode from "./DarkMode"
+//import * as reach from '@reach-sh/stdlib/ALGO';
+
+import Algorand from "algosdk";
+import axios from 'axios';
 
 const Explore=({handleLogout})=> {
 
@@ -533,6 +537,177 @@ const buynow= async(a) =>{
     return data;
   }
 
+  const algocons=async()=>{
+
+    const algosdk = require('algosdk');
+
+//hackathon
+const token = "ef920e2e7e002953f4b29a8af720efe8e4ecc75ff102b165e0472834b25832c1";
+const server = "http://hackathon.algodev.network";
+const port = 9100;
+
+// // sandbox
+// const token = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+// const server = "http://localhost";
+// const port = 4001;
+
+// Structure for changing blockchain params
+var cp = {
+    fee: 0,
+    firstRound: 0,
+    lastRound: 0,
+    genID: "",
+    genHash: ""
+}
+// Utility function to update params from blockchain
+var getChangingParms = async function (algodclient) {
+    let params = await algodclient.getTransactionParams();
+    cp.firstRound = params.lastRound;
+    cp.lastRound = cp.firstRound + parseInt(1000);
+  //  let sfee = await algodclient.suggestedFee();
+  //  cp.fee = sfee.fee;
+    cp.fee = params.fee;
+    cp.genID = params.genesisID;
+    cp.genHash = params.genesishashb64;
+}
+
+// Function used to wait for a tx confirmation
+const waitForConfirmation = async function (algodclient, txId) {
+    let lastround = (await algodclient.status()).lastRound;
+    while (true) {
+        const pendingInfo = await algodclient.pendingTransactionInformation(txId);
+        if (pendingInfo.round !== null && pendingInfo.round > 0) {
+            //Got the completed Transaction
+            alert("Transaction " + pendingInfo.tx + " confirmed in round " + pendingInfo.round);
+            break;
+        }
+        lastround++;
+        await algodclient.statusAfterBlock(lastround);
+    }
+};
+
+
+
+// var account1_mnemonic = "portion never forward pill lunch organ biology" +
+//     " weird catch curve isolate plug innocent skin grunt" +
+//     " bounce clown mercy hole eagle soul chunk type absorb trim";
+
+var account1_mnemonic = "canal enact luggage spring similar zoo couple stomach shoe laptop middle wonder eager monitor weather number heavy skirt siren purity spell maze warfare ability ten";
+
+var recoveredAccount1 = algosdk.mnemonicToSecretKey(account1_mnemonic);
+console.log(recoveredAccount1.addr);
+
+// Instantiate the algod wrapper
+let algodclient = new algosdk.Algod(token, server, port);
+
+
+(async () => {
+    // Asset Creation:
+    // The first transaciton is to create a new asset
+    // Get last round and suggested tx fee
+    // We use these to get the latest round and tx fees
+    // These parameters will be required before every 
+    // Transaction
+    // We will account for changing transaction parameters
+    // before every transaction in this example
+    await getChangingParms(algodclient);
+    let note = undefined; // arbitrary data to be stored in the transaction; here, none is stored
+
+    // Asset creation specific parameters
+    // The following parameters are asset specific
+    // Throughout the example these will be re-used. 
+    // We will also change the manager later in the example
+    let addr = recoveredAccount1.addr;
+    // Whether user accounts will need to be unfrozen before transacting    
+    let defaultFrozen = false;
+    // integer number of decimals for asset unit calculation
+    let decimals = 0;
+    // total number of this asset available for circulation   
+    let totalIssuance = 1000;
+    // Used to display asset units to user    
+    let unitName = "LATINUM";
+    // Friendly name of the asset    
+    let assetName = "latinum";
+    // Optional string pointing to a URL relating to the asset
+    let assetURL = "http://someurl";
+    // Optional hash commitment of some sort relating to the asset. 32 character length.
+    let assetMetadataHash = "16efaa3924a6fd9d3a4824799a4ac65d";
+    // The following parameters are the only ones
+    // that can be changed, and they have to be changed
+    // by the current manager
+    // Specified address can change reserve, freeze, clawback, and manager
+    // signing and sending "txn" allows "addr" to create an asset
+    
+    let txn = algosdk.makeAssetCreateTxn(addr, cp.fee, cp.firstRound, cp.lastRound, note,
+        cp.genHash, cp.genID, totalIssuance, decimals, defaultFrozen, 
+         unitName, assetName, assetURL, assetMetadataHash);
+
+    let rawSignedTxn = txn.signTxn(recoveredAccount1.sk)
+    let tx = (await algodclient.sendRawTransaction(rawSignedTxn).do());
+    console.log("Transaction : " + tx.txId);
+    let assetID = null;
+    // wait for transaction to be confirmed
+    await waitForConfirmation(algodclient, tx.txId);
+    // Get the new asset's information from the creator account
+    let ptx = await algodclient.pendingTransactionInformation(tx.txId);
+    assetID = ptx.txresults.createdasset;
+    console.log("AssetID = " + assetID);
+
+    //your terminal output should ber similar to this
+    // Transaction: RXSAJUYVPDWUF4XNGA2VYQX3NUVT5YJEZZ5SJXIIASZK5M55LVVQ
+    // Transaction RXSAJUYVPDWUF4XNGA2VYQX3NUVT5YJEZZ5SJXIIASZK5M55LVVQ confirmed in round 4272786
+    // AssetID = 149657
+
+   
+    // Change Asset Configuration:
+    // Change the manager using an asset configuration transaction
+
+    // First update changing transaction parameters
+    // We will account for changing transaction parameters
+    // before every transaction in this example
+    await getChangingParms(algodclient);
+
+    await getChangingParms(algodclient);
+
+
+    // The address for the from field must be the manager account
+    // Which is currently the creator addr1
+    addr = recoveredAccount1.addr;
+
+    // if all assets are held by the asset creator,
+    // the asset creator can sign and issue "txn" to remove the asset from the ledger. 
+    let dtxn = algosdk.makeAssetDestroyTxn(addr, cp.fee, cp.firstRound, cp.lastRound, note, cp.genHash, cp.genID, assetID);
+    // The transaction must be signed by the manager which 
+    // is currently set to account1
+    rawSignedTxn = dtxn.signTxn(recoveredAccount1.sk)
+    let dtx = (await algodclient.sendRawTransaction(rawSignedTxn).do());
+    console.log("Transaction : " + dtx.txId);
+    // wait for transaction to be confirmed
+    await waitForConfirmation(algodclient, dtx.txId);
+
+    // The account3 and account1 should no longer contain the asset as it has been destroyed
+    console.log("Asset ID: " + assetID);
+    
+})().catch(e => {
+    console.log(e);
+    console.trace();
+});
+
+
+
+
+
+
+  }
+
+
+  
+    const action = useCallback(async () => {
+
+      
+
+    });
+
   return (
     <>
 
@@ -567,6 +742,17 @@ const buynow= async(a) =>{
       {/* <img style={{width:"100px",height:"100px"}} src="/logo.svg" alt=""/> */}
 
       <div style={{backgroundColor:'white',height:'43px',width:'1154px',marginLeft:'150px',marginBlock:'15px'}}>
+
+
+      <button
+              style={{outline: 'none'}}
+                class="btn btn-info btn-block"
+                type="button"                
+                onClick={algocons}
+              >
+                algo
+              </button>
+              {' '}
 
       <Link
               to="/">              

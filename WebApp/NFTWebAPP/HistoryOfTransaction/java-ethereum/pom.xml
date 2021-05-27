@@ -1,0 +1,40 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>io.kauri.tutorials.java-ethereum</groupId>
+  <artifactId>java-ethereum</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <properties>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>    
+</properties>
+  <dependencies>
+    <dependency>
+      
+      <groupId>org.json</groupId>
+    <artifactId>json</artifactId>
+    <version>20140107</version>
+    </dependency>
+    
+    <dependency>
+    <groupId>org.apache.poi</groupId>
+    <artifactId>poi-ooxml</artifactId>
+    <version>3.17</version>
+</dependency>
+
+<!-- dependency used for XLS older file format
+     (added for information) -->
+<dependency>
+    <groupId>org.apache.poi</groupId>
+    <artifactId>poi</artifactId>
+    <version>3.17</version>
+</dependency>
+
+
+<dependency>
+<groupId>org.web3j</groupId> 
+  <artifactId>core</artifactId>
+  <version>4.3.0</version>
+ </dependency>
+    
+  </dependencies>
+</project>
