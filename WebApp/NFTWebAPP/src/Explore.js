@@ -28,6 +28,10 @@ import Logo from './logo.svg';
 
 import "./App.css"
 import DarkMode from "./DarkMode"
+//import * as reach from '@reach-sh/stdlib/ALGO';
+
+import Algorand from "algosdk";
+import axios from 'axios';
 
 const Explore=({handleLogout})=> {
 
@@ -533,6 +537,64 @@ const buynow= async(a) =>{
     return data;
   }
 
+  const algocons=async()=>{
+
+
+
+const token = 'https://testnet-algorand.api.purestake.io/idx2 ';
+const server = 'http://127.0.0.1';
+const port = 8080;
+const client = new Algorand.Algodv2(token, server, port);
+
+alert("client"+token);
+alert("client"+port);
+alert("client"+client);
+
+(async () => {
+  console.log(await client.status());
+  alert("await status"+ await client.status());
+})().catch((e) => {
+  console.log(e);
+});
+
+
+    // Algosigner.connect()
+    // .then((d)=>{
+
+    // })
+    // .catch((e)=>{
+    //   console.error(e);
+    // })
+
+    // install-wallet.blade.php
+//async signInWithAlgoSigner() {
+  //Check if AlgoSigner is installed
+  //if (!isAlgoSignerInstalled()) {
+    //  console.log('AlgoSigner is not installed');
+      //return false;
+  //}
+
+  // Check if AlgoSigner is connected
+  // const connected = await Algorand.connect();
+
+  // if (!connected)
+  //     return;
+
+  // // Fetch the first account
+  // const accounts = await Algorand.accounts({ ledger: 'TestNet' });
+  // const formData = {
+  //     provider: 'algosigner',
+  //     address: accounts[0].address,
+  // };
+
+  // return axios.post('/signin', formData).then((response) => {
+  //     window.location.href = "{{ route('wallet.index')}}";
+  // }).catch((error) => {
+  //     console.log(error.response);
+  // });
+
+  }
+
   return (
     <>
 
@@ -567,6 +629,17 @@ const buynow= async(a) =>{
       {/* <img style={{width:"100px",height:"100px"}} src="/logo.svg" alt=""/> */}
 
       <div style={{backgroundColor:'white',height:'43px',width:'1154px',marginLeft:'150px',marginBlock:'15px'}}>
+
+
+      <button
+              style={{outline: 'none'}}
+                class="btn btn-info btn-block"
+                type="button"                
+                onClick={algocons}
+              >
+                algo
+              </button>
+              {' '}
 
       <Link
               to="/">              
