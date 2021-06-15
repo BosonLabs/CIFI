@@ -160,7 +160,7 @@ for(var i=1;i<5;i++){
   var count=0
   var v=String(i);
   var firebase= fireDB.database().ref(v);
-  firebase.child("No").once("value",function(snapshot){
+  firebase.child("No").once("value",function(snapshot) { 
     var n=snapshot.val(); 
     if(n){
       
