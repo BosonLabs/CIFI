@@ -53,7 +53,7 @@ const Footers = () => {
   //getac=localStorage.getItem("wallet");
   //console.log("getmetamask",getac)
   
-  if(localStorage.getItem("wallet") === null || localStorage.getItem("wallet") === "0x" || localStorage.getItem("wallet") === 'undefined' || localStorage.getItem("wallet") === ''){
+  if(localStorage.getItem("wallet") === null || localStorage.getItem("wallet") === "0x" || localStorage.getItem("wallet") === undefined || localStorage.getItem("wallet") === ''){
 
   }
   else{
@@ -101,15 +101,17 @@ const Footers = () => {
             <Link className={styles.logo} to="/">
               <Image
                 className={styles.pic}
-                src="/images/logocifisnew.png"
-                srcDark="/images/logocifis.png"
+                // src="/images/logocifisnew.png"
+                // srcDark="/images/logocifis.png"
+                src="https://cifi-mvp-nest.vercel.app/static/media/cifi.540fecbe.png"
+                srcDark="https://cifi-mvp-nest.vercel.app/static/media/cifi.540fecbe.png"
                 alt="Fitness Pro"
               />
             </Link>
             <div className={styles.info}>The New Creative Economy.</div>
             <div className={styles.version}>
-              <div className={styles.details}>Dark theme</div>
-              <Theme className="theme-big" />
+              <div className={styles.details} ng-checked="true">Light theme</div>
+              <Theme className="theme-big"  boo="true"/>
             </div>
           </div>
           <div className={styles.col}>

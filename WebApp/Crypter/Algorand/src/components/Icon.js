@@ -102,7 +102,7 @@ const Icon = (props) => {
       width={size}
       height={size}
       viewBox="0 0 16 16"
-      fill={fill}
+      fill={fill}      
     >
       <path d={icons[props.name]}></path>
     </svg>

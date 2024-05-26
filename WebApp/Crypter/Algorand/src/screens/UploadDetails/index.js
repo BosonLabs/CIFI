@@ -228,16 +228,16 @@ const Upload = () => {
   let history=useHistory();
   const [isOpen, setIsOpen] = useState(false);
   const [isOpens, setIsOpens] = useState(false);
-  //const [ipfsHash,setIpfsHash] = useState(null);
+  const [ipfsHash,setIpfsHash] = useState(null);
   //const [ipf,setIpf] = useState(null);
-  //const [buffer,setBuffer] = useState("");
+  const [buffer,setBuffer] = useState("");
   const [Img,setImg] = useState("")
   const [tname,setName] = useState("");
   const [tdescription,setDescription] = useState("");
-  //const [tmnemonic,setMnemonic] = useState("");
+  const [tmnemonic,setMnemonic] = useState("");
   //const [isLoading, setLoading] = useState(false)
   //const [currentid, setCurrentid] = useState("");
-  //let tf;
+  let ge;
 
   console.log("description",tdescription)
   //
@@ -281,9 +281,9 @@ const Upload = () => {
   
 const convertToBuffer = async(reader) => {
   //file is converted to a buffer for upload to IPFS
-    //const buffer = await Buffer.from(reader.result);
+    const buffer = await Buffer.from(reader.result);
   //set this buffer -using es6 syntax
-    //setBuffer(buffer);
+    setBuffer(buffer);
 };
 // const onSubmitImage = async (event) => {
 
@@ -756,17 +756,6 @@ const addfire=()=>{
 
 useEffect(()=>{addfire()},[])
 
-const checkurl=async()=>{  
-//const indexerserver = 'https://testnet-algorand.api.purestake.io/idx2';
-//const indexport='';
-//let algoindexer = new algosdk.Indexer(token,indexerserver,indexport);
-//let algodClient = new algosdk.Algodv2(token, server, port);
-//const algosdk = require('algosdk');
-//const token = {
-  //  'X-API-key' : 'B3SU4KcVKi94Jap2VXkK83xx38bsv95K5UZm2lab',
-//}
-
-}
 
 const onSubmitNFT = async (event) => {
   event.preventDefault();  
@@ -781,13 +770,30 @@ const onSubmitNFT = async (event) => {
     else{
 
 
-    //  if(selected === null || selected2 === null){
+     if(tmnemonic === null || tmnemonic === "" || tmnemonic === " "){
 
-      //  alert("please select league name/team name")
+       alert("please Enter your Mnemonic")
 
-    //  }
+     }
 
-      //else{
+      else{
+
+    //   await ipfs.add(buffer, (err, ipfsHash) => {
+    //   console.log(err,ipfsHash);
+    //   console.log("buff",buffer);
+    //   setIpfsHash(ipfsHash[0].hash);
+    //   console.log(ipfsHash[0].hash)
+    //   const CID = require('cids')
+    //   var cid = new CID(ipfsHash[0].hash)
+    //   //let ccp=cid.toV1().toBaseEncodedString('base32');
+    //   console.log( cid.toV1().toBaseEncodedString('base32'));
+    //   //setIpf(cid.toV1().toBaseEncodedString('base32'));      
+      
+    // }).then(()=>{
+
+    //   //setVisiblePreview(true)
+    // }); 
+
 
     //const accounts = await web3.eth.getAccounts();
     //console.log("acc",accounts[0]);
@@ -859,18 +865,51 @@ algodClient.healthCheck().do()
 .then((d) => {
   let txParamsJS = d;
   console.log("txparamsJS",txParamsJS)
+  let program = new Uint8Array(Buffer.from("ASAEADoKAS0VIhJAACIvFSISQAAVLRUjEkAAAC4VIg1AAAAvFSQNQAAGLS4TQAAAJQ==", "base64"));
+  const args=[];
+  //args.push([...Buffer.from(idget.toString())]);
+  //const args=[];
+  args.push([...Buffer.from(accounts[0].address)]);//creator address
+  args.push([...Buffer.from('RWYPYF5XX40P2L6BCMZAA4ETP3S3HSF32QSWSGMXAU05NBJPKPHR6YCCAE')]);//lsig address
+  args.push([...Buffer.from('')]);
+
+  let lsig = algosdk.makeLogicSig(program,args);
+  //let thirumnemonic= 'empower twist carpet lawsuit across tape add leopard prevent abandon squeeze egg clown river funny sea labor level scheme race crime mystery party absent exist'
+  //var recoveredAccount1 = algosdk.mnemonicToSecretKey(thirumnemonic);
   const txn = algosdk.makeAssetCreateTxnWithSuggestedParamsFromObject({    
     from: accounts[0].address,
     assetName: tname,
     unitName: tb,
-    total: +1000,
-    decimals: +2,
+    total: 1,
+    decimals: 0,
     note: AlgoSigner.encoding.stringToByteArray("nothing"),
+    //manager:lsig.address(),
+    manager:accounts[0].address,
+    reserve:accounts[0].address,
+    freeze: accounts[0].address,
+    clawback:accounts[0].address,
     //AlgoSigner.encoding.stringToByteArray(document.getElementById('note').value),
     suggestedParams: txParamsJS
   });
-  
-
+  // let assetURLs = "http://someurl";
+  // let assetMetadataHash = "16efaa3924a6fd9d3a4824799a4ac65d";
+  // const txn = algosdk.makeAssetCreateTxnWithSuggestedParamsFromObject({    
+  //     from: accounts[0].address,
+  //     note: AlgoSigner.encoding.stringToByteArray("nothing"),
+  //     total: +1000,
+  //     decimals: +2,
+  //     defaultFrozen : false,
+  //     manager:accounts[0].address,
+  //     reserve:accounts[0].address,
+  //     freeze: accounts[0].address,
+  //     clawback:accounts[0].address,
+  //     unitName: tb,
+  //     assetName: tname,
+  //     assetURL:assetURLs,
+  //     assetMetadataHash:undefined,
+  //     //AlgoSigner.encoding.stringToByteArray(document.getElementById('note').value),
+  //     params: txParamsJS
+  //   });
   console.log("txnprint",txn)
   // Use the AlgoSigner encoding library to make the transactions base64
   const txn_b64 = AlgoSigner.encoding.msgpackToBase64(txn.toByte());
@@ -894,6 +933,13 @@ algodClient.healthCheck().do()
         path: '/v2/transactions/pending/' + tx.txId
       })
       .then((d) => {
+
+
+        //new code addedd
+        
+
+
+        //end new code added
         console.log(d);        
         //console.log("before",tx.txId)        
       setIsOpens(true)
@@ -912,7 +958,7 @@ algodClient.healthCheck().do()
                       ipfsUrl:Img,ownerAddress:accounts[0].address,soldd:"",extra1:"",previousoaddress:"",datesets:dateset,
                       whois:'',
                       league:selected,team:selected2,type:selected3,
-                      teamlogo:selectedImg,dimen:selected4,description:tdescription,history:""})
+                      teamlogo:selectedImg,dimen:selected4,description:tdescription,history:"",Mnemonic:""})
                       .then(()=>{
 
                       ref22.child(db).set({id:idget,imageUrl:Img,priceSet:"",cAddress:tx.txId,keyId:db,
@@ -920,15 +966,61 @@ algodClient.healthCheck().do()
                       ipfsUrl:Img,ownerAddress:accounts[0].address,soldd:"",extra1:"",
                       previousoaddress:"",datesets:dateset,whois:'',
                       league:selected,team:selected2,type:selected3,teamlogo:selectedImg,dimen:selected4,
-                      description:tdescription,history:""})
+                      description:tdescription,history:"",Mnemonic:""})
                       .then(()=>{
+
+//               //             const axios = require('axios');
+//               //             let pinataApiKey='88348e7ce84879e143e1';
+//               //             let pinataSecretApiKey='e4e8071ff66386726f9fe1aebf2d3235a9f88ceb4468d4be069591eb78d4bf6f';
+
+//               //             const pinataSDK = require('@pinata/sdk');
+//               //             const pinata = pinataSDK(pinataApiKey, pinataSecretApiKey);
+//               //                         pinata.testAuthentication().then((result) => {
+//               // //handle successful authentication here
+//               // console.log(result);
+      
+//               // //let ge=ipfsHash;
+//               // // /console.log("ipfsHash",ipfsHash);
+//               //         const body = {
+//               //             message: ge
+//               //         };
+//               //         const options = {
+//               //             pinataMetadata: {
+//               //                 name: tname,
+//               //                 keyvalues: {
+//               //                     customKey: 'customValue',
+//               //                     customKey2: 'customValue2'
+//               //                 }
+//               //             },
+//               //             pinataOptions: {
+//               //                 cidVersion: 0
+//               //             }
+//               //         };
+//               //         pinata.pinJSONToIPFS(body, options).then((result) => {
+//               //             //handle results here
+//               //             console.log(result);
+//               //             console.log("jsonresult")
+//               //             //setVisibleModal(false)
+//               //             //setIsOpen(true);
+      
+                          
+//               //           }).catch((err) => {
+//               //               //handle error here
+//               //               console.log(err);
+//               //           });
+            
+                      
+// })().catch(e => {
+//   console.log(e);
+//   console.trace();
+// });
+
+
+
                         setIsOpens(false)
                       setIsOpen(true);
                       })              
-                      })    
-    
-
-        
+                      })            
       })
       .catch((e) => {
         console.error(e);
@@ -970,6 +1062,7 @@ algodClient.healthCheck().do()
     
   //}
 }
+    }
 }
 
 
@@ -1027,6 +1120,37 @@ const callof=()=>{
   }
 }
 
+const checkurl=async()=>{  
+  //const indexerserver = 'https://testnet-algorand.api.purestake.io/idx2';
+  //const indexport='';
+  //let algoindexer = new algosdk.Indexer(token,indexerserver,indexport);
+  //let algodClient = new algosdk.Algodv2(token, server, port);
+  //const algosdk = require('algosdk');
+  //const token = {
+    //  'X-API-key' : 'B3SU4KcVKi94Jap2VXkK83xx38bsv95K5UZm2lab',
+  //}
+  //AiAHewYBBAAFAyYFAVMBQgJCTgJTTgFDMwAYIhIzABAjEhAxCTIDEhAxIDIDEhBAAAEANwAaACgSQAFrNwAaACkSQAEtNwAaACoSQACNNwAaACsSQAANNwAaACcEEkAAAQAkQzIEJRIzAhAlEhAzAhEiEhAzAhQzAAASEEAAAQAzAxAlEjMDESISEDMDEiQSEEAAAQAzARAkEjMBADMAABIQQAABADMDADMAABJBAA0zAQgzAgEPQAABACRDMwMAMwAAE0EAETMBCDMCATMDAQgPQAABACRDIQRDMwIQJRIzAhEiEhAzAhQzAAASMwIAMwAAEhEQMgQhBRIQQAABADMDECUSMwMRIhIQMwMSJBIQQAABADMEECUSMwQRIhIQQAABADMBECQSMwEAMwAAEhBAAAEAMwIAMwAAEkEAETMBCDMDATMEAQgPQAABACRDMwIUMwAAEkEAFTMBCDMCATMDAQgzBAEID0AAAQAkQyEEQzIEIQYSMwIQJRIQMwIRIhIQMwIUMwAAEhAzARAkEhAzAQAzAAASEDMBCDMCAQ8QQAABACRDMgQhBhIzARAkEhAzAQAzAAASEDMBCDMCAQ8QMwIQJRIQMwIRIhIQMwISJBIQMwIUMwAAEhBAAAEAJEM=  
+  const algosdk = require('algosdk');
+  let program = new Uint8Array(Buffer.from("AiAHewYBBAAFAyYFAVMBQgJCTgJTTgFDMwAYIhIzABAjEhAxCTIDEhAxIDIDEhBAAAEANwAaACgSQAFrNwAaACkSQAEtNwAaACoSQACNNwAaACsSQAANNwAaACcEEkAAAQAkQzIEJRIzAhAlEhAzAhEiEhAzAhQzAAASEEAAAQAzAxAlEjMDESISEDMDEiQSEEAAAQAzARAkEjMBADMAABIQQAABADMDADMAABJBAA0zAQgzAgEPQAABACRDMwMAMwAAE0EAETMBCDMCATMDAQgPQAABACRDIQRDMwIQJRIzAhEiEhAzAhQzAAASMwIAMwAAEhEQMgQhBRIQQAABADMDECUSMwMRIhIQMwMSJBIQQAABADMEECUSMwQRIhIQQAABADMBECQSMwEAMwAAEhBAAAEAMwIAMwAAEkEAETMBCDMDATMEAQgPQAABACRDMwIUMwAAEkEAFTMBCDMCATMDAQgzBAEID0AAAQAkQyEEQzIEIQYSMwIQJRIQMwIRIhIQMwIUMwAAEhAzARAkEhAzAQAzAAASEDMBCDMCAQ8QQAABACRDMgQhBhIzARAkEhAzAQAzAAASEDMBCDMCAQ8QMwIQJRIQMwIRIhIQMwISJBIQMwIUMwAAEhBAAAEAJEM=", "base64"));
+    const args=[];
+    args.push([...Buffer.from("31840066")]);
+
+    args.push([...Buffer.from("BAZXPXEGPFQ7JVOZ7BZUYK36EXLRAWC7MAG3O2SPDWMVCYDMRLCHC6JC2U")]);
+    args.push([...Buffer.from("BAZXPXEGPFQ7JVOZ7BZUYK36EXLRAWC7MAG3O2SPDWMVCYDMRLCHC6JC2U")]);
+    args.push([...Buffer.from("RSWT2ZWIDPYTL4WX2NMIVWQOFCTBKEMQCXBNMHNT4NXOMDSNET66YBZT5Y")]);
+    args.push([...Buffer.from("10000")]);
+    //args.push([...Buffer.from('')]);    
+    let lsig = algosdk.makeLogicSig(program,args);
+    console.log("lsigaddress",lsig.address())
+  }
+  
+  const atomic=()=>{
+    // Transaction A to C 
+    const algosdk = require('algosdk');
+//let transaction1 = algosdk.makePaymentTxnWithSuggestedParams("BAZXPXEGPFQ7JVOZ7BZUYK36EXLRAWC7MAG3O2SPDWMVCYDMRLCHC6JC2U", "RSWT2ZWIDPYTL4WX2NMIVWQOFCTBKEMQCXBNMHNT4NXOMDSNET66YBZT5Y", 1000000, undefined, undefined, params);  
+// Create transaction B to A
+//let transaction2 = algosdk.makePaymentTxnWithSuggestedParams(myAccountB.addr, myAccountA.addr, 2000000, undefined, undefined, params);  
+  }
 
 
   return (
@@ -1092,6 +1216,16 @@ const callof=()=>{
                       placeholder="e. g. “After purchasing you will able to recived the logo...”"
                       required
                       onChange={event => setDescription( event.target.value)}
+                    />
+
+<TextInput
+                      className={styles.field}
+                      lebel="Mnemonic"
+                      name="Mnemonic"
+                      type="text"
+                      placeholder="e. g. “Enter Your Mnemonic here...”"
+                      required
+                      onChange={event => setMnemonic( event.target.value)}
                     />
 
 {/* <div className="col-md-4"> */}
@@ -1310,7 +1444,7 @@ const callof=()=>{
 
       {/* onClose={() => setIsOpens(false)} */}
 
-      {/* <button
+      <button
                   className={cn("button", styles.button)}
                   onClick={() => checkurl()}
                   // type="button" hide after form customization
@@ -1319,9 +1453,7 @@ const callof=()=>{
                   
                   <span>CHECK</span>
                   <Icon name="arrow-next" size="10" />
-                </button> */}
-
-
+                </button>
     </>
   );
 };

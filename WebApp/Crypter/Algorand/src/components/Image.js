@@ -6,6 +6,7 @@ const Image = ({ className, src, srcDark, srcSet, srcSetDark, alt }) => {
 
   return (
     <img
+      style={{width:"50px",height:"50px"}}
       className={className}
       srcSet={darkMode.value ? srcSetDark : srcSet}
       src={darkMode.value ? srcDark : src}

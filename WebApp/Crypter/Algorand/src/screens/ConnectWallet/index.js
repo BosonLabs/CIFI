@@ -13,15 +13,30 @@ import FolowStepsd from "./FolowStepsd";
 import Modald from "../../components/ModalD";
 import fireDb from '../UploadDetails/firebase';
 import MyAlgo from '@randlabs/myalgo-connect';
+import ModalList from "../../components/ModalList";
+import FolowStepsList from "./FolowStepList";
 
 
 
 const Connect = () => {
+  
   let history=useHistory();
   
   const [age, setAge] = useState(true);
   const [conditions, setConditions] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  //const [isOpenlist, setIsOpenlist] = useState(false);
+  //const [isOpenbutton, setIsOpenbutton] = useState(true);
+  //const [isList, setisList] = useState([]);
+  //const [isClick, setClick] = useState();
+  //const [isClicktry, setClicktry] = useState();
+  const [isOpenlisttry, setIsOpenlisttry] = useState(false);
+  const [isListtry, setisListtry] = useState([]);
+  const [isListtrys, setisListtrys] = useState();
+  console.log("isClickingstate",isListtrys)
+  //console.log("isClicking",isClick)
+  //console.log("islistfirst",isList)
+  
   // const togglePopup = () => {
   //   setIsOpen(false);
   //   history.push("/")
@@ -94,61 +109,81 @@ const Connect = () => {
 //         //alert("connected....")
 //       }
 //     },
-    {
-      title: "Algosigner Wallet",
-      color: "#3772FF",
-      onclick:()=>{
-        console.log("Coinbase")
-  
-        AlgoSigner.connect()
-    .then((d) => {
+//     {
+//       title: "Algosigner Wallet",
+//       color: "#3772FF",
+//       onclick:()=>{
+//         console.log("Coinbase")
+        
+//         AlgoSigner.connect()
+//     .then((d) => {
     
-    AlgoSigner.accounts({
-      ledger: 'TestNet'
-    })
-    .then((d) => {
-      let accounts = d;
-      console.log("acc Algo",accounts[0].address)
-      localStorage.setItem("wallet",accounts[0].address)
+//     AlgoSigner.accounts({
+//       ledger: 'TestNet'
+//     })
+//     .then((d) => {
+//       let accounts = d;
+//       setisListtry(d)
+//       setIsOpenlisttry(true)
+//       console.log("acc Algo",isListtrys)
+//       if(isListtrys === null || isListtrys === "" || isListtrys === undefined)
+//       {
+//         localStorage.setItem("wallet","")
+//       }
+//       else{
+//         localStorage.setItem("wallet",isListtrys)
+//       }    
+//       if(localStorage.getItem("wallet") === null || localStorage.getItem("wallet") === "0x" || localStorage.getItem("wallet") === 'undefined' || localStorage.getItem("wallet") === '' || localStorage.getItem("wallet") === undefined)
+// {
 
-      if(localStorage.getItem("wallet") === null || localStorage.getItem("wallet") === "0x" || localStorage.getItem("wallet") === 'undefined' || localStorage.getItem("wallet") === '' || localStorage.getItem("wallet") === undefined)
-{
+//     let refprofile=fireDb.database().ref(`profiledata/${isListtrys}`);
+//     let dateset=new Date().toDateString();
+//     console.log("dateget",dateset)
+//     const db = refprofile.push().key;
+//     console.log("dbcheck",db)
+//           refprofile.set({profileurl:"",displayname:"aaaa",http:"",Bio:"",social:"",Twitter:"",address:"",dbkey:"",username:"bbbb"}).then(()=>{                      
+//             setIsOpen(true)
+//           })                
+// }
+// else{
 
-    let refprofile=fireDb.database().ref(`profiledata/${accounts[0].address}`);
-    let dateset=new Date().toDateString();
-    console.log("dateget",dateset)
-    const db = refprofile.push().key;
-    console.log("dbcheck",db)
-          refprofile.set({profileurl:"",displayname:"aaaa",http:"",Bio:"",social:"",Twitter:"",address:"",dbkey:"",username:"bbbb"}).then(()=>{                      
-          })                
-}
-else{
+//   setisListtry(d)
+//   setIsOpenlisttry(true)
+//   if(isListtrys === null || isListtrys === "" || isListtrys === undefined)
+//       {
+//         localStorage.setItem("wallet","")
+//       }
+//       else{
+//         localStorage.setItem("wallet",isListtrys)
+//       }
 
-  localStorage.setItem("wallet",accounts[0].address)
-  let refprofile=fireDb.database().ref(`profiledata/${accounts[0].address}`);
-    let dateset=new Date().toDateString();
-    console.log("dateget",dateset)
-    const db = refprofile.push().key;
-    console.log("dbcheck",db)
-          refprofile.set({profileurl:"",displayname:"aaaa",http:"",Bio:"",social:"",Twitter:"",address:"",dbkey:"",username:"bbbb"}).then(()=>{                      
-          })                
+//   //localStorage.setItem("wallet",isListtrys)
+//   let refprofile=fireDb.database().ref(`profiledata/${isListtrys}`);
+//     let dateset=new Date().toDateString();
+//     console.log("dateget",dateset)
+//     const db = refprofile.push().key;
+//     console.log("dbcheck",db)
+//           refprofile.set({profileurl:"",displayname:"aaaa",http:"",Bio:"",social:"",Twitter:"",address:"",dbkey:"",username:"bbbb"}).then(()=>{                      
 
-  setIsOpen(true)
-}
-    })
-    .catch((e) => {
-      console.error(e);
-    });
+//             setIsOpen(true)
+//           })                
+
+//   //setIsOpen(true)
+// }
+//     })
+//     .catch((e) => {
+//       console.error(e);
+//     });
   
-  })
-  .catch((e) => {
-    console.error(e);
-  });
+//   })
+//   .catch((e) => {
+//     console.error(e);
+//   });
   
   
-      }
+//       }
   
-    }
+//     }
     //,
     // {
     //   title: "MyEtherWallet",
@@ -164,27 +199,66 @@ else{
 
   const onClo=()=>{
 
-    console.log("hello onclo")
-    
+    console.log("hello onclo")  
     //setIsOpen(false);
     history.push("/")
     window.location.reload();
     window.location.reload();
 
   }
+
   
+const algosignertry=()=>{
+  AlgoSigner.connect()
+.then((d) => {
+AlgoSigner.accounts({
+  ledger: 'TestNet'
+})
+.then((d) => {
+  let accounts = d;
+  //document.getElementById("listacc").innerHTML=accounts[0].address;
+  console.log("listaccount",d)
+  setisListtry(d)
+  setIsOpenlisttry(true)  
+})
+.catch((e) => {
+  console.error(e);
+}); 
+
+
+})
+.catch((e) => {
+console.error(e);
+});
+
+}
+
+
+
 
   return (
     
   <>  
     <div className={cn("section-pt80", styles.section)}>
       <div className={cn("container", styles.container)}>
-        <div className={styles.head}>
+        {/* <div className={styles.head}>
           <Link className={styles.back} to="/">
             <Icon name="arrow-prev" size="24" />
             <div className={cn("h2", styles.stage)}>Connect your wallet</div>            
           </Link>
-        </div>
+        </div> */}
+
+        {isListtrys === null || isListtrys === "" || isListtrys === undefined ? <>
+                
+                <button className={cn("button", styles.button)} onClick={()=>algosignertry()} id="listacc">
+                Algosigner Wallet
+              </button>                
+              </> :<>
+              <button className={cn("button", styles.button)} onClick={()=>algosignertry()} id="listacc">
+                Algosigner Wallet
+              </button>                                
+              </>}
+
         <div className={styles.body}>
           <div className={styles.menu}>
                 
@@ -281,19 +355,16 @@ else{
         <FolowStepsd className={styles.steps} onClo={()=>onClo}/>
       </Modald>
 
-
-    
-
-    
-    {/* {isOpen && <Popup  content={<>
-      <b>Notification</b>
-      <p>Your are connected successfully......</p>
-      <button type="button" onClick={togglePopup}>close</button>
-    </>}    
-    // handleClose={togglePopup}    
-  />} */}
-
-  
+      
+    <ModalList visible={isOpenlisttry} >
+        <FolowStepsList className={styles.steps} data={isListtry} datas={(a)=>
+        {
+          setisListtrys(a)
+          setIsOpenlisttry(false)          
+          setIsOpen(true)
+        }
+        }/>          
+    </ModalList>  
   </>
   );
 };
