@@ -7,10 +7,10 @@ import Icon from "../../components/Icon";
 import Dropdown from "../../components/Dropdown";
 import firebase from "../UploadDetails/firebase";
 //UploadDetails/firebase
-
 // data
 //import { bids } from "../../mocks/bids";
 import CardBuy from "../../components/CardBuy";
+import algosdk from 'algosdk';
 
 const navLinks = [
   "All items", "Art", "Game", "Photography", "Music", "Video"
@@ -32,9 +32,9 @@ const Search = () => {
   const [creator, setCreator] = useState(creatorOptions[0]);
 
   //const [search, setSearch] = useState("");
-  const [values, setValues] = useState([5]);
-  const[getImgreffalgosale,setgetImgreffalgosale]=useState([]);
-  console.log("getImgalgo",getImgreffalgosale)
+  const [values, setValues] = useState([1]);
+  // const[getImgreffalgosale,setgetImgreffalgosale]=useState([]);
+  // console.log("getImgalgo",getImgreffalgosale)
 
   const[getI,setgetI]=useState([]);
   console.log("getImgal",getI)
@@ -42,47 +42,43 @@ const Search = () => {
   const[getIm,setgetIm]=useState([]);
   console.log("getImgalgosss",getIm)
 
-  
+
+  const token = {
+    'X-API-Key': 'U5ivl9nv603lYUBRN3sHH5g0AzCwsetC7OAtYj9D'
+   };
+  const server = "https://testnet-algorand.api.purestake.io/ps2";
+  const port = "";
+  let algodclient = new algosdk.Algodv2(token, server, port);
+
+  const sleep = (milliseconds) => {
+    return new Promise(resolve => setTimeout(resolve, milliseconds))
+  }
 
   const dbcallsaleal=async(index)=>{
+    console.log("hello ramachandran")
     setActiveIndex(index)
     console.log("inside dbcallsalealgo function")
-
-
-    if(localStorage.getItem("walletalgo") === null || localStorage.getItem("walletalgo") === "0x"){
-
+    if(localStorage.getItem("wallet")  === null || localStorage.getItem("wallet")  === "" || localStorage.getItem("wallet")  === " " || localStorage.getItem("wallet") === 'undefined' || localStorage.getItem("wallet") === '' || localStorage.getItem("wallet") === "0x"){
     }
-    else{
-
-    
-    //let getalgo=localStorage.getItem("walletalgo");
-    //let req = [];
-  
-    // if(getalgo === ""){
-  
+    else{    
+    //let getalgo=localStorage.getItem("wallet");
+    //let req = [];  
+    // if(getalgo === ""){  
     // }else{
-
-      //let req = [];
-    let req2 = [];//imagerefexplore//
+      let req = [];
+      console.log("req",req)
+   // let req2 = [];//imagerefexplore//
     firebase.database().ref("imagerefexploreoneAlgos").on("value", (data) => {
       if (data) {
         data.forEach((d) => {
-          req2.push(d.val())          
-        });        
-      }
-      
-    });
-    
-    setgetIm(req2)
-
-    let req=[];
-
-    getIm.map((a)=>{
-      console.log(`abb`, a)    
-      Object.keys(a).map((b)=>{
-
-        console.log(a[b].id);
-                req.push({
+          //req2.push(a.val())          
+          const a=d.val();
+          Object.keys(a).map(async(b)=>{                            
+            //console.log(a[b].id);          
+            const nftdata = await fetch(`https://demonft-2e778-default-rtdb.firebaseio.com/Algoopt/${localStorage.getItem("wallet")}/${a[b].applicationid}/opt.json`);      
+            const resdata1 = await nftdata.json();        
+            console.log("restdata1",resdata1)        
+              req.push({
                 title: a[b].id,
                 price: a[b].priceSet,
                 highestBid: a[b].keyId,
@@ -102,95 +98,112 @@ const Search = () => {
                 previousaddress:a[b].previousoaddress,
                 soldd:a[b].soldd,
                 whois:a[b].whois,
-
+                Mnemonic:a[b].Mnemonic,
+                usdcids:a[b].usdcids,
+              applicationid:a[b].applicationid,
+              escrowaddress:a[b].escrowaddress,
+              resdata1:resdata1,
                 users: [                
                   {
-                    avatar: "/images/content/avatar-4.jpg",
+                    //avatar: "/images/content/avatar-4.jpg",
+                    avatar: a[b].imageUrl,
                   },
                 ],
-              })
-              
-      })      
-      setgetI(req)    
-    })    
-    console.log("cfbbba",req) 
-  }
-  //}
-  
+              })                                                                                                    
+          })                                                                     
+        });                        
+        setgetI(req)
+      }       
+    });               
+  } 
 }
-  useEffect(()=>{dbcallsaleal()},[])
+useEffect(()=>{dbcallsaleal()},[])
 
-  const dbcallsalealgo=async()=>{
-    console.log("inside dbcallsalealgo function")
-    
-    let req = [];
-  
-    if(localStorage.getItem("walletalgo") === null || localStorage.getItem("walletalgo") === "0x"){
-  
-    }else{
-  
-    
-      let getalgo=localStorage.getItem("walletalgo");
+  // async function readLocalState(client, account, index){
+  //   let accountInfoResponse = await client.accountInformation(account).do();
+  //   for (let i = 0; i < accountInfoResponse['apps-local-state'].length; i++) { 
+  //       if (accountInfoResponse['apps-local-state'][i].id === index) {
+  //           console.log("User's local state: optted checked");
+  //           // for (let n = 0; n < accountInfoResponse['apps-local-state'][i][`key-value`].length; n++) {
+  //           //     let enc = accountInfoResponse['apps-local-state'][i][`key-value`][n];
+  //           //     var decodedString = window.atob(enc.key);
+  //           //     if(decodedString === "B"){
+  //           //       setBid(enc.value.uint);
+  //           //     }
+  //           // }
+  //       }
+  //       else{
+  //         console.log("User's local state: not opt checked");
+  //       }
+  //   }
+  // }
+
+  // const dbcallsalealgo=async()=>{
+  //   console.log("inside dbcallsalealgo function")    
+  //   let req = [];  
+  //   if(localStorage.getItem("walletalgo") === null || localStorage.getItem("walletalgo") === "0x"){  
+  //   }else{      
+  //     let getalgo=localStorage.getItem("walletalgo");
       
-      //let kreq =[];
-      firebase.database().ref("imagerefexploreoneAlgos").child(getalgo).on("value", (data) => {
-        if (data) {
-          data.forEach((d) => {
-            //console.log("keycheck",d.key)
-            let value=d.val();
-            req.push(
+  //     //let kreq =[];
+  //     firebase.database().ref("imagerefexploreoneAlgos").child(getalgo).on("value", (data) => {
+  //       if (data) {
+  //         data.forEach((d) => {
+  //           //console.log("keycheck",d.key)
+  //           let value=d.val();
+  //           req.push(
               
-              {
-              title: value.id,
-              price: value.priceSet,
-              highestBid: value.keyId,
-              counter:value.userName ,
-              //bid: 'New bid <span role="img" aria-label="fire">🔥</span>',
-              bid:value.ownerAddress,
-              image: value.imageUrl,
-              image2x: value.paramsdb,
-              category: value.privatekey,
-              categoryText: value.cAddress,
-              //purchasing !
-              url: value.history,
-              date:value.datesets,
-              description:value.description,
-              extra:value.extra1,
-              ipfsurl:value.ipfsUrl,
-              previousaddress:value.previousoaddress,
-              soldd:value.soldd,
-              whois:value.whois,
-              users: [                
-                {
-                  avatar: "/images/content/avatar-4.jpg",
-                },
-              ],
-              },
+  //             {
+  //             title: value.id,
+  //             price: value.priceSet,
+  //             highestBid: value.keyId,
+  //             counter:value.userName ,
+  //             //bid: 'New bid <span role="img" aria-label="fire">🔥</span>',
+  //             bid:value.ownerAddress,
+  //             image: value.imageUrl,
+  //             image2x: value.paramsdb,
+  //             category: value.privatekey,
+  //             categoryText: value.cAddress,
+  //             //purchasing !
+  //             url: value.history,
+  //             date:value.datesets,
+  //             description:value.description,
+  //             extra:value.extra1,
+  //             ipfsurl:value.ipfsUrl,
+  //             previousaddress:value.previousoaddress,
+  //             soldd:value.soldd,
+  //             whois:value.whois,
+  //             users: [                
+  //               {
+  //                 avatar: "/images/content/avatar-4.jpg",
+  //               },
+  //             ],
+  //             },
             
-            )
-          });        
-        }
-      });
-      setgetImgreffalgosale(req);
+  //           )
+  //         });        
+  //       }
+  //     });
+  //     setgetImgreffalgosale(req);
     
-    }
-    console.log("acc",getImgreffalgosale)
+  //   }
+  //   console.log("acc",getImgreffalgosale)
   
-  }
+  // }
   
-  useEffect(()=>{dbcallsalealgo()},[])
+  // useEffect(()=>{dbcallsalealgo()},[])
   
 
-  const handleSubmit = (e) => {
+  // const handleSubmit = (e) => {
 
-    if(searchTerm === '') return getI
-    let data= getI.filter((val)=>{
-      return val.counter.toLowerCase().trim().includes(searchTerm.toLowerCase().trim())
+  //   if(searchTerm === '') return getI
+  //   let data= getI.filter((val)=>{
+  //     return val.counter.toLowerCase().trim().includes(searchTerm.toLowerCase().trim())
       
-    })
-    //console.log('returndata',data)
-    return data;    
-  };
+  //   })
+  //   //console.log('returndata',data)
+  //   return data;    
+  // };
 
   const STEP = 0.1;
   const MIN = 0.01;
@@ -250,34 +263,27 @@ const Search = () => {
             />
           </div>
           <div className={styles.nav}>
-            {navLinks.map((x, index) => (
-                         
-              
+            {navLinks.map((x, index) => (                                       
               <button
                 className={cn(styles.link, {
                   [styles.active]: index === activeIndex,
-                })}
-                
-                
-                onClick={() =>
-                  
+                })}                                
+                //onClick={() =>                  
                   //console.log("index",index)
-                  dbcallsaleal(index)
-                }
+                  //dbcallsaleal(index)
+                //}
                 key={index}
               >
                 {x}
-              </button>
-
-              
-              
+              </button>                          
             ))}
           </div>
+          
         </div>
         <div className={styles.row}>
           <div className={styles.filters}>
             <div className={styles.range}>
-              <div className={styles.label}>Price range</div>
+              <div className={styles.label}>Price range</div>              
               <Range
                 values={values}
                 step={STEP}
@@ -343,7 +349,7 @@ const Search = () => {
                         backgroundColor: "#141416",
                       }}
                     >
-                      {values[0].toFixed(1)}
+                      {values[0].toFixed(1)}                      
                     </div>
                   </div>
                 )}
@@ -388,11 +394,12 @@ const Search = () => {
             </div>
           </div>
           <div className={styles.wrapper}>
-            <div className={styles.list}>
-              
-              {handleSubmit().map((x, index) => (                              
-                <CardBuy className={styles.card} item={x} key={index} />                
-              ))}
+            <div className={styles.list}>              
+              {getI.map((x, index) => {
+                console.log("logo",x)
+                return(                                                                                            
+                <CardBuy className={styles.card} item={x} key={index} />                                                
+              )})}              
             </div>
             <div className={styles.btns}>
               <button className={cn("button-stroke", styles.button)}>

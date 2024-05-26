@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import React from "react";
 import "./styles/app.sass";
 import Page from "./components/Page";
 import Home from "./screens/Home";
@@ -13,9 +14,11 @@ import Profile from "./screens/Profile";
 import ProfileEdit from "./screens/ProfileEdit";
 import Item from "./screens/Item";
 import PageList from "./screens/PageList";
-function App() {
-  return (    
-    <Router>
+import "./style.css";
+
+function App() {  
+  return (        
+    <Router>      
       <Switch>
         <Route
           exact
@@ -126,8 +129,8 @@ function App() {
             </Page>
           )}
         />
-      </Switch>
-    </Router>
+      </Switch>      
+    </Router>    
   );
 }
 

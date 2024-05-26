@@ -14,7 +14,7 @@ import Loader from "../../components/Loader";
 //import Cards from "./Cards";
 //import FolowSteps from "./FolowSteps";
 import Compress from "react-image-file-resizer";
-//import ipfs from "./ipfs";
+import ipfs from "./ipfs";
 //import lottery from './nftcontract';//this line import lottery folder
 //import web3 from './web3';
 import fireDb from './firebase';
@@ -225,19 +225,25 @@ const Upload = () => {
   let tb;
   let te;
   //
-  let history=useHistory();
+  let history=useHistory();  
+  const [Buttonopen, setButtonopen] = useState(false);
+  const [lsigget, setlsig] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [isOpens, setIsOpens] = useState(false);
-  //const [ipfsHash,setIpfsHash] = useState(null);
+  const [ipfsHash,setIpfsHash] = useState(null);
   //const [ipf,setIpf] = useState(null);
-  //const [buffer,setBuffer] = useState("");
+  const [buffer,setBuffer] = useState("");
   const [Img,setImg] = useState("")
+  console.log("Imgpinata",Img)
+  console.log("ImgpinataBuffer",buffer)
   const [tname,setName] = useState("");
   const [tdescription,setDescription] = useState("");
   //const [tmnemonic,setMnemonic] = useState("");
   //const [isLoading, setLoading] = useState(false)
   //const [currentid, setCurrentid] = useState("");
-  //let tf;
+  let ge;
+  const [assetidget,setassetid] = useState("");
+  console.log("getassetid",assetidget)
 
   console.log("description",tdescription)
   //
@@ -275,19 +281,35 @@ const Upload = () => {
     );
     reader.readAsArrayBuffer(file)
     reader.onloadend = () => convertToBuffer(reader);    
-    console.log(reader)
-    
+    console.log(reader)    
   };
   
 const convertToBuffer = async(reader) => {
   //file is converted to a buffer for upload to IPFS
-    //const buffer = await Buffer.from(reader.result);
+    const buffer = await Buffer.from(reader.result);
   //set this buffer -using es6 syntax
-    //setBuffer(buffer);
+    setBuffer(buffer);
+    //await onSubmitImage();
+//    await sleep(10)
+    await ipfs.add(buffer, (err, ipfsHash) => {
+    //console.log(err,ipfsHash);
+    console.log("buff",buffer);
+    setIpfsHash(ipfsHash[0].hash);
+    console.log(ipfsHash[0].hash)
+    const CID = require('cids')
+    var cid = new CID(ipfsHash[0].hash)
+    //let ccp=cid.toV1().toBaseEncodedString('base32');
+    console.log("cid",cid.toV1().toBaseEncodedString('base32'));
+    setButtonopen(true)
+    //setIpf(cid.toV1().toBaseEncodedString('base32'));      
+        })
+        //.then(()=>{
+      //setVisiblePreview(true)
+    //});
 };
 // const onSubmitImage = async (event) => {
 
-//   console.log("onsubmitimage called")
+//     console.log("onsubmitimage called")
 //     await ipfs.add(buffer, (err, ipfsHash) => {
 //       console.log(err,ipfsHash);
 //       console.log("buff",buffer);
@@ -301,6 +323,7 @@ const convertToBuffer = async(reader) => {
       
 //     }).then(()=>{
 
+//       console.log("ipfs added")
 //       //setVisiblePreview(true)
 //     });
 // }; 
@@ -715,123 +738,93 @@ const convertToBuffer = async(reader) => {
 // }
 
 
-const addfire=()=>{
+// const addfire=()=>{
 
-  let ref23=fireDb.database().ref(`tokenkey`);      
-      let getfire="";
-      let setfire="";
-      fireDb.database().ref(`tokenkey`).on("value", (data) => {
-        if (data) {
-           data.forEach((d) => {
-            getfire=parseInt(d.val());
-            setfire= parseInt(getfire)+1;
-            console.log("getfire",getfire)
-            console.log("setfire",setfire)
+//   let ref23=fireDb.database().ref(`tokenkey`);      
+//       let getfire="";
+//       let setfire="";
+//       fireDb.database().ref(`tokenkey`).on("value", (data) => {
+//         if (data) {
+//            data.forEach((d) => {
+//             getfire=parseInt(d.val());
+//             setfire= parseInt(getfire)+1;
+//             console.log("getfire",getfire)
+//             console.log("setfire",setfire)
             
-          });         
-        }
-      })
-      //ref23.update({id:setfire});
+//           });         
+//         }
+//       })
+//       //ref23.update({id:setfire});
 
       
       
-      // console.log("setfire",setfire)
-      // //alert("your token"+setfire+"getfire"+getfire);      
-      te= getfire;
-      let ts= setfire;
-            if(ts === "")
-            {
-              console.log("empty",ts)
-              te=1000
-              ref23.update({id:te.toString()});
-            }
-            else{
-              console.log("notempty")
-              //setfire= parseInt(getfire)+1;
-              //te=parseInt(getfire)
-              ref23.update({id:setfire});
-            }
-      console.log("te",te)    
-}
+//       // console.log("setfire",setfire)
+//       // //alert("your token"+setfire+"getfire"+getfire);      
+//       te= getfire;
+//       let ts= setfire;
+//             if(ts === "")
+//             {
+//               console.log("empty",ts)
+//               te=1000
+//               ref23.update({id:te.toString()});
+//             }
+//             else{
+//               console.log("notempty")
+//               //setfire= parseInt(getfire)+1;
+//               //te=parseInt(getfire)
+//               ref23.update({id:setfire});
+//             }
+//       console.log("te",te)    
+// }
 
-useEffect(()=>{addfire()},[])
+// useEffect(()=>{addfire()},[])
 
-const checkurl=async()=>{  
-//const indexerserver = 'https://testnet-algorand.api.purestake.io/idx2';
-//const indexport='';
-//let algoindexer = new algosdk.Indexer(token,indexerserver,indexport);
-//let algodClient = new algosdk.Algodv2(token, server, port);
-//const algosdk = require('algosdk');
-//const token = {
-  //  'X-API-key' : 'B3SU4KcVKi94Jap2VXkK83xx38bsv95K5UZm2lab',
-//}
-
-}
+const waitForConfirmation = async function (algodclient, txId) {
+  let status = (await algodclient.status().do());
+  let lastRound = status["last-round"];
+    while (true) {
+      const pendingInfo = await algodclient.pendingTransactionInformation(txId).do();
+      if (pendingInfo["confirmed-round"] !== null && pendingInfo["confirmed-round"] > 0) {
+        //Got the completed Transaction
+        console.log("Transaction " + txId + " confirmed in round " + pendingInfo["confirmed-round"]);
+        break;
+      }
+      lastRound++;
+      await algodclient.statusAfterBlock(lastRound).do();
+    }
+  };
 
 const onSubmitNFT = async (event) => {
   event.preventDefault();  
     //new write below
 
-    if(localStorage.getItem("wallet") === null || localStorage.getItem("wallet") === "0x" || localStorage.getItem("wallet") === 'undefined' || localStorage.getItem("wallet") === ''){
-
+    if(localStorage.getItem("wallet") === null || localStorage.getItem("wallet") === "0x" || localStorage.getItem("wallet") === undefined || localStorage.getItem("wallet") === ''){
 
       console.log("Empty",localStorage.getItem("wallet"))
 
     }
     else{
 
-
-    //  if(selected === null || selected2 === null){
-
-      //  alert("please select league name/team name")
-
-    //  }
-
-      //else{
-
-    //const accounts = await web3.eth.getAccounts();
-    //console.log("acc",accounts[0]);
     ta=tname;
     tb='ALGO';
     te=1000;
     let idget="";
-    let txnInfo;
-
 
     console.log("uploadonecheck",ta);
     console.log("uploadtwocheck",tb);
     console.log("uploadtwocheck",te);
 
-    //var tb=tdescription;
-    //var tc='https://ipfs.io/ipfs/'+ipfsHash;
-    //var td=toaddress;
-    //var te=tid;
-    //tf='https://ipfs.io/ipfs/'+ipfsHash;
-    //let tdescription=tdes;
-
     setVisibleModal(false)                        
-      
-      // if(Img === '')
-      // {
-
-      //   alert("Please upload images...")
-
-      // }
-      //else{
-    
-      
-const algosdk = require('algosdk');  
-
-let accounts;
-let tx;
-const server = "https://testnet-algorand.api.purestake.io/ps2";
+        const algosdk = require('algosdk');  
+        if(localStorage.getItem("net") === "mainnet")
+        {
+          let accounts;
+let txasset;
+const server = "https://mainnet-algorand.api.purestake.io/ps2";
 const port = "";  
 const token = {
       'X-API-key' : 'SVsJKi8vBM1RwK1HEuwhU20hYmwFJelk8bagKPin',
 }
-//const indexerserver = 'https://testnet-algorand.api.purestake.io/idx2';
-//const indexport='';
-//let algoindexer = new algosdk.Indexer(token,indexerserver,indexport);
 
 let algodClient = new algosdk.Algodv2(token, server, port);
 //const algosdk = require('algosdk');  
@@ -849,28 +842,185 @@ algodClient.healthCheck().do()
 .then(d => { 
   
   AlgoSigner.accounts({
-    ledger: 'TestNet'
+    ledger: 'MainNet'
   })
   .then((d) => {
     console.log("tested2",d)
     accounts = d;
-    console.log("algoacc",accounts[0].address)
+    console.log("algoacc",localStorage.getItem("wallet"))
+    algodClient.getTransactionParams().do()
+.then((d) => {
+  let txParamsJS = d;
+  console.log("txparamsJS",txParamsJS)
+  let program = new Uint8Array(Buffer.from("ASAEADoKAS0VIhJAACIvFSISQAAVLRUjEkAAAC4VIg1AAAAvFSQNQAAGLS4TQAAAJQ==", "base64"));
+  const args=[];
+  //args.push([...Buffer.from(idget.toString())]);
+  //const args=[];
+  args.push([...Buffer.from(localStorage.getItem("wallet"))]);//creator address
+  args.push([...Buffer.from('RWYPYF5XX40P2L6BCMZAA4ETP3S3HSF32QSWSGMXAU05NBJPKPHR6YCCAE')]);//lsig address
+  args.push([...Buffer.from('')]);
+
+  let lsig = algosdk.makeLogicSig(program,args);
+  //let thirumnemonic= 'empower twist carpet lawsuit across tape add leopard prevent abandon squeeze egg clown river funny sea labor level scheme race crime mystery party absent exist'
+  //var recoveredAccount1 = algosdk.mnemonicToSecretKey(thirumnemonic);
+  const txn = algosdk.makeAssetCreateTxnWithSuggestedParamsFromObject({    
+    from: localStorage.getItem("wallet"),
+    assetName: tname,
+    unitName: tb,
+    total: 1,
+    decimals: 0,
+    note: AlgoSigner.encoding.stringToByteArray("nothing"),
+    //manager:lsig.address(),
+    manager:localStorage.getItem("wallet"),
+    reserve:localStorage.getItem("wallet"),
+    freeze: localStorage.getItem("wallet"),
+    clawback:localStorage.getItem("wallet"),
+    //AlgoSigner.encoding.stringToByteArray(document.getElementById('note').value),
+    suggestedParams: txParamsJS
+  });
+  console.log("txnprint",txn)
+  // Use the AlgoSigner encoding library to make the transactions base64
+  const txn_b64 = AlgoSigner.encoding.msgpackToBase64(txn.toByte());
+  
+  AlgoSigner.signTxn([{txn: txn_b64}])
+  .then((d) => {
+    console.log("signTx",d)
+    let signedTxs = d;
+    let signCodeElem = JSON.stringify(d, null, 2);
+    console.log("signcoderElem",signCodeElem)
+
+    AlgoSigner.send({
+      ledger: 'MainNet',
+      tx: signedTxs[0].blob
+    })
+    .then((d) => {
+      txasset = d.txId;
+      setassetid(d.txId)
+      console.log("txidprint",txasset)
+      AlgoSigner.algod({
+        ledger: 'MainNet',
+        path: '/v2/transactions/pending/' + txasset
+      })
+      .then((d) => {
+
+
+        //new code addedd
+        
+
+
+        //end new code added
+        console.log(d);        
+        //console.log("before",tx.txId)        
+      setIsOpens(true)
+        
+        let ref2=fireDb.database().ref(`imagerefAlgo/${localStorage.getItem("wallet")}`);
+        let ref22=fireDb.database().ref(`imagerefAlgolt`);
+    //.child(selected).child(selected2).child(accounts[0]);    
+
+    
+                      let dateset=new Date().toDateString();
+                      console.log("dateget",dateset)
+                      const db = ref2.push().key;                         
+                      const db2 = ref22.push().key;                         
+                      console.log("dbcheck",db)
+                      ref2.child(db).set({id:idget,imageUrl:Img,priceSet:"",cAddress:txasset,keyId:db,userName:ta,userSymbol:tb,
+                      ipfsUrl:Img,ownerAddress:localStorage.getItem("wallet"),soldd:"",extra1:"",previousoaddress:"",datesets:dateset,
+                      whois:'',
+                      league:selected,team:selected2,type:selected3,
+                      teamlogo:selectedImg,dimen:selected4,description:tdescription,history:"",Mnemonic:""})
+                      .then(()=>{
+
+                      ref22.child(db).set({id:idget,imageUrl:Img,priceSet:"",cAddress:txasset,keyId:db,
+                      userName:ta,userSymbol:tb,
+                      ipfsUrl:Img,ownerAddress:localStorage.getItem("wallet"),soldd:"",extra1:"",
+                      previousoaddress:"",datesets:dateset,whois:'',
+                      league:selected,team:selected2,type:selected3,teamlogo:selectedImg,dimen:selected4,
+                      description:tdescription,history:"",Mnemonic:""})
+                      .then(()=>{
+                        setIsOpens(false)
+                      setIsOpen(true);
+                      })              
+                      })            
+      })
+      .catch((e) => {
+        console.error(e);
+      });
+    })
+    .catch((e) => {
+      console.error(e);
+    });
+
+  })
+  .catch((e) => {
+    console.error(e);
+  });
+})
+.catch((e) => {
+  console.error(e);
+});
+  })
+  .catch((e) => {
+    console.error(e);
+  });
+
+})
+.catch(e => { 
+  console.error(e); 
+});
+
+
+})
+.catch((e) => {
+  console.error(e);
+});
+
+
+        }
+        else{
+let accounts;
+let txasset;
+let txx;
+const server = "https://testnet-algorand.api.purestake.io/ps2";
+const port = "";  
+const token = {
+      'X-API-key' : 'SVsJKi8vBM1RwK1HEuwhU20hYmwFJelk8bagKPin',
+}
+const baseServer = "https://testnet-algorand.api.purestake.io/idx2";    
+let indexerClient = new algosdk.Indexer(token, baseServer, port);
+
+let algodClient = new algosdk.Algodv2(token, server, port);
+AlgoSigner.connect()
+.then((d) => {
+console.log("tested1")
+algodClient.healthCheck().do()
+.then(d => { 
+  
+  AlgoSigner.accounts({
+    ledger: 'TestNet'
+  })
+  .then((d) => {
+    setIsOpens(true)
+    console.log("tested2",d)
+    accounts = d;
+    console.log("algoacc",localStorage.getItem("wallet"))
     algodClient.getTransactionParams().do()
 .then((d) => {
   let txParamsJS = d;
   console.log("txparamsJS",txParamsJS)
   const txn = algosdk.makeAssetCreateTxnWithSuggestedParamsFromObject({    
-    from: accounts[0].address,
+    from: localStorage.getItem("wallet"),
     assetName: tname,
     unitName: tb,
-    total: +1000,
-    decimals: +2,
+    total: 1,
+    decimals: 0,
     note: AlgoSigner.encoding.stringToByteArray("nothing"),
-    //AlgoSigner.encoding.stringToByteArray(document.getElementById('note').value),
+    //manager:lsig.address(),
+    manager:localStorage.getItem("wallet"),
+    reserve:localStorage.getItem("wallet"),
+    freeze: localStorage.getItem("wallet"),
+    clawback:localStorage.getItem("wallet"),
     suggestedParams: txParamsJS
   });
-  
-
   console.log("txnprint",txn)
   // Use the AlgoSigner encoding library to make the transactions base64
   const txn_b64 = AlgoSigner.encoding.msgpackToBase64(txn.toByte());
@@ -886,48 +1036,27 @@ algodClient.healthCheck().do()
       ledger: 'TestNet',
       tx: signedTxs[0].blob
     })
-    .then((d) => {
-      tx = d;
-      console.log("txidprint",tx.txId)
+    .then(async(d) => {
+      txasset = d.txId;
+      setassetid(d.txId)
+      txx=d;
+      console.log("txidprint",txasset)
+      console.log("alldata",d)
+      await waitForConfirmation(algodClient, d.txId);
       AlgoSigner.algod({
         ledger: 'TestNet',
-        path: '/v2/transactions/pending/' + tx.txId
+        path: '/v2/transactions/pending/' + txasset
       })
-      .then((d) => {
-        console.log(d);        
+      .then(async(d) => {
+        //new code addedd
+        let ptx = await algodClient.pendingTransactionInformation(txx.txId).do();
+        let assetID = ptx["asset-index"];
+        console.log("pendingass",assetID);        
+        console.log("pending",d);        
+        await sleep(1000)
+        //checkurl(assetID);
+         creatapplication(assetID,txx.txId);
         //console.log("before",tx.txId)        
-      setIsOpens(true)
-        
-        let ref2=fireDb.database().ref(`imagerefAlgo/${accounts[0].address}`);
-        let ref22=fireDb.database().ref(`imagerefAlgolt`);
-    //.child(selected).child(selected2).child(accounts[0]);    
-
-    
-                      let dateset=new Date().toDateString();
-                      console.log("dateget",dateset)
-                      const db = ref2.push().key;                         
-                      const db2 = ref22.push().key;                         
-                      console.log("dbcheck",db)
-                      ref2.child(db).set({id:idget,imageUrl:Img,priceSet:"",cAddress:tx.txId,keyId:db,userName:ta,userSymbol:tb,
-                      ipfsUrl:Img,ownerAddress:accounts[0].address,soldd:"",extra1:"",previousoaddress:"",datesets:dateset,
-                      whois:'',
-                      league:selected,team:selected2,type:selected3,
-                      teamlogo:selectedImg,dimen:selected4,description:tdescription,history:""})
-                      .then(()=>{
-
-                      ref22.child(db).set({id:idget,imageUrl:Img,priceSet:"",cAddress:tx.txId,keyId:db,
-                      userName:ta,userSymbol:tb,
-                      ipfsUrl:Img,ownerAddress:accounts[0].address,soldd:"",extra1:"",
-                      previousoaddress:"",datesets:dateset,whois:'',
-                      league:selected,team:selected2,type:selected3,teamlogo:selectedImg,dimen:selected4,
-                      description:tdescription,history:""})
-                      .then(()=>{
-                        setIsOpens(false)
-                      setIsOpen(true);
-                      })              
-                      })    
-    
-
         
       })
       .catch((e) => {
@@ -961,78 +1090,1695 @@ algodClient.healthCheck().do()
 .catch((e) => {
   console.error(e);
 });
-  
-  //let getData=localStorage.getItem('myData')                    
-    
-    //  }
-  
 
-    
-  //}
+
+        }
+    }
 }
-}
-
-
-
-  
-
-
-// const dbstore=async()=>{
-
-//   if(localStorage.getItem("wallet") === null || localStorage.getItem("wallet")==="0x" || localStorage.getItem("wallet") === 'undefined' || localStorage.getItem("wallet") === ''){
-
-//   }
-//   else{
-
-
-  
-//         //end               
-// }
-// }
-
-
 
 const onSub=()=>{
-
   console.log("hello close")
   //setIsOpen(false);
   history.push("/")
-
 }
 
+const sleep = (milliseconds) => {
+  return new Promise(resolve => setTimeout(resolve, milliseconds))
+}
 
 const callof=()=>{
-
-  
   if(Img === "" && tname === "" && tdescription === ""){
     alert("please fill all details")
   }
   else if(Img === ""){
-
     alert("please upload Image details")
-
   }
   else if(tname === ""){
     alert("please fill name details")
-
   }
   else if(tdescription === ""){
     alert("please fill description details")
-
   }
   else{
-
     //alert("call")
     setVisibleModal(true)
   }
 }
 
+// const checkurl=async()=>{
+//   setIsOpens(true)
+//   const algosdk = require('algosdk');
+//   const port = "";  
+//   const token = {
+//         'X-API-key' : 'SVsJKi8vBM1RwK1HEuwhU20hYmwFJelk8bagKPin',
+//   }
+//   const baseServer = "https://testnet-algorand.api.purestake.io/idx2";    
+//   let indexerClient = new algosdk.Indexer(token, baseServer, port);
+//   let txnInfo;
+//   let idget;
+//   do{
+//     txnInfo=  await indexerClient.searchForTransactions().txid(assetidget).do();      
+//     await sleep(2000)
+//     console.log("idp",txnInfo)
+//     if(txnInfo.transactions.length === 1)
+//     idget=txnInfo.transactions[0]["created-asset-index"];
+//     await sleep(2000)
+//     console.log("idgetting",idget)
+//   }while(txnInfo.transactions.length !== 1 )
+  
+//   creatapplication(idget,assetidget);                    
+// }
 
+const creatapplication=async(idget,txxid)=>{
+  
+  setIsOpens(true)
+  console.log("createapplication",idget)
+  const algosdk = require('algosdk');  
+  let algodPort = "";
+  // declare application state storage (immutable)
+  let localInts = 1;
+  let localBytes = 0;
+  let globalInts = 4;
+  let globalBytes = 3;
+  
+  // user declared approval program (initial)
+let approvalProgramSourceInitial = `#pragma version 4
+  txn ApplicationID
+  int 0
+  ==
+  bnz main_l74
+  txn CloseRemainderTo
+  global ZeroAddress
+  ==
+  txn RekeyTo
+  global ZeroAddress
+  ==
+  &&
+  bnz main_l3
+  err
+  main_l3:
+  txn OnCompletion
+  int OptIn
+  ==
+  bnz main_l71
+  txn OnCompletion
+  int UpdateApplication
+  int DeleteApplication
+  ||
+  ==
+  bnz main_l70
+  txn OnCompletion
+  int CloseOut
+  ==
+  bnz main_l67
+  txna ApplicationArgs 0
+  byte "B"
+  ==
+  bnz main_l52
+  txna ApplicationArgs 0
+  byte "S"
+  ==
+  bnz main_l39
+  txna ApplicationArgs 0
+  byte "BN"
+  ==
+  bnz main_l28
+  txna ApplicationArgs 0
+  byte "SN"
+  ==
+  bnz main_l15
+  txna ApplicationArgs 0
+  byte "C"
+  ==
+  bnz main_l12
+  err
+  main_l12:
+  txn Sender
+  byte "C"
+  app_global_get
+  ==
+  byte "E"
+  app_global_get
+  global ZeroAddress
+  ==
+  &&
+  bnz main_l14
+  err
+  main_l14:
+  byte "E"
+  txna Accounts 1
+  app_global_put
+  int 1
+  return
+  main_l15:
+  int 1
+  byte "B"
+  app_local_get
+  int 0
+  !=
+  gtxn 2 AssetAmount
+  int 1
+  byte "B"
+  app_local_get
+  ==
+  &&
+  gtxn 2 Sender
+  byte "E"
+  app_global_get
+  ==
+  &&
+  gtxn 1 Receiver
+  byte "E"
+  app_global_get
+  ==
+  &&
+  bnz main_l17
+  err
+  main_l17:
+  int 1
+  byte "B"
+  int 0
+  app_local_put
+  byte "B"
+  byte "B"
+  app_global_get
+  int 1
+  -
+  app_global_put
+  gtxn 3 AssetReceiver
+  txna Accounts 1
+  ==
+  bnz main_l19
+  err
+  main_l19:
+  byte "O"
+  app_global_get
+  global ZeroAddress
+  ==
+  bnz main_l25
+  byte "O"
+  app_global_get
+  txn Sender
+  ==
+  bnz main_l22
+  int 0
+  return
+  main_l22:
+  gtxn 3 Sender
+  byte "E"
+  app_global_get
+  ==
+  bnz main_l24
+  err
+  main_l24:
+  byte "A"
+  int 0
+  app_global_put
+  byte "O"
+  global ZeroAddress
+  app_global_put
+  int 1
+  return
+  main_l25:
+  gtxn 3 Sender
+  txn Sender
+  ==
+  bnz main_l27
+  err
+  main_l27:
+  int 1
+  return
+  main_l28:
+  byte "A"
+  app_global_get
+  int 0
+  !=
+  byte "O"
+  app_global_get
+  global ZeroAddress
+  !=
+  &&
+  bnz main_l30
+  err
+  main_l30:
+  int 0
+  byte "B"
+  app_local_get
+  int 0
+  !=
+  bnz main_l38
+  main_l31:
+  gtxn 2 AssetReceiver
+  byte "E"
+  app_global_get
+  ==
+  bnz main_l37
+  main_l32:
+  gtxn 2 Sender
+  byte "E"
+  app_global_get
+  ==
+  bnz main_l36
+  main_l33:
+  int 0
+  byte "B"
+  app_local_get
+  byte "A"
+  app_global_get
+  ==
+  gtxn 1 Receiver
+  byte "E"
+  app_global_get
+  ==
+  &&
+  gtxn 3 Sender
+  byte "E"
+  app_global_get
+  ==
+  &&
+  gtxn 4 AssetReceiver
+  byte "O"
+  app_global_get
+  ==
+  &&
+  gtxn 4 Sender
+  byte "E"
+  app_global_get
+  ==
+  &&
+  gtxn 4 AssetAmount
+  byte "A"
+  app_global_get
+  ==
+  &&
+  bnz main_l35
+  err
+  main_l35:
+  byte "A"
+  int 0
+  app_global_put
+  byte "O"
+  global ZeroAddress
+  app_global_put
+  int 0
+  byte "B"
+  int 0
+  app_local_put
+  int 1
+  return
+  main_l36:
+  int 0
+  byte "B"
+  int 0
+  byte "B"
+  app_local_get
+  gtxn 2 AssetAmount
+  -
+  app_local_put
+  b main_l33
+  main_l37:
+  int 0
+  byte "B"
+  int 0
+  byte "B"
+  app_local_get
+  gtxn 2 AssetAmount
+  +
+  app_local_put
+  b main_l32
+  main_l38:
+  byte "B"
+  byte "B"
+  app_global_get
+  int 1
+  -
+  app_global_put
+  b main_l31
+  main_l39:
+  global GroupSize
+  int 2
+  ==
+  bnz main_l49
+  main_l40:
+  txna ApplicationArgs 1
+  btoi
+  byte "A"
+  app_global_get
+  !=
+  byte "O"
+  app_global_get
+  txn Sender
+  ==
+  &&
+  bnz main_l42
+  err
+  main_l42:
+  byte "A"
+  txna ApplicationArgs 1
+  btoi
+  app_global_put
+  global GroupSize
+  int 3
+  ==
+  bnz main_l46
+  byte "A"
+  app_global_get
+  int 0
+  !=
+  bnz main_l45
+  err
+  main_l45:
+  int 1
+  return
+  main_l46:
+  gtxn 2 Sender
+  byte "E"
+  app_global_get
+  ==
+  bnz main_l48
+  err
+  main_l48:
+  byte "O"
+  global ZeroAddress
+  app_global_put
+  int 1
+  return
+  main_l49:
+  byte "O"
+  app_global_get
+  global ZeroAddress
+  ==
+  byte "A"
+  app_global_get
+  int 0
+  ==
+  &&
+  gtxn 1 AssetReceiver
+  byte "E"
+  app_global_get
+  ==
+  &&
+  gtxn 1 TypeEnum
+  int axfer
+  ==
+  &&
+  gtxn 1 XferAsset
+  byte "N"
+  app_global_get
+  ==
+  &&
+  gtxn 1 AssetAmount
+  int 1
+  ==
+  &&
+  gtxn 1 Sender
+  gtxn 0 Sender
+  ==
+  &&
+  bnz main_l51
+  err
+  main_l51:
+  byte "O"
+  txn Sender
+  app_global_put
+  b main_l40
+  main_l52:
+  int 0
+  store 0
+  int 0
+  byte "B"
+  app_local_get
+  store 1
+  global GroupSize
+  int 2
+  ==
+  bnz main_l64
+  main_l53:
+  global GroupSize
+  int 3
+  ==
+  bnz main_l61
+  main_l54:
+  load 0
+  int 1
+  ==
+  bnz main_l56
+  err
+  main_l56:
+  int 0
+  byte "B"
+  app_local_get
+  int 0
+  !=
+  load 1
+  int 0
+  ==
+  &&
+  bnz main_l60
+  main_l57:
+  int 0
+  byte "B"
+  app_local_get
+  int 0
+  ==
+  load 1
+  int 0
+  !=
+  &&
+  bnz main_l59
+  main_l58:
+  int 1
+  return
+  main_l59:
+  byte "B"
+  byte "B"
+  app_global_get
+  int 1
+  -
+  app_global_put
+  b main_l58
+  main_l60:
+  byte "B"
+  byte "B"
+  app_global_get
+  int 1
+  +
+  app_global_put
+  b main_l57
+  main_l61:
+  gtxn 2 Sender
+  byte "E"
+  app_global_get
+  ==
+  gtxn 1 Receiver
+  byte "E"
+  app_global_get
+  ==
+  &&
+  gtxn 2 AssetAmount
+  int 0
+  !=
+  &&
+  bnz main_l63
+  err
+  main_l63:
+  int 0
+  byte "B"
+  int 0
+  byte "B"
+  app_local_get
+  gtxn 2 AssetAmount
+  -
+  app_local_put
+  int 1
+  store 0
+  b main_l54
+  main_l64:
+  gtxn 1 AssetReceiver
+  byte "E"
+  app_global_get
+  ==
+  gtxn 1 Sender
+  gtxn 0 Sender
+  ==
+  &&
+  gtxn 1 TypeEnum
+  int axfer
+  ==
+  &&
+  gtxn 1 XferAsset
+  byte "U"
+  app_global_get
+  ==
+  &&
+  bnz main_l66
+  err
+  main_l66:
+  int 0
+  byte "B"
+  int 0
+  byte "B"
+  app_local_get
+  gtxn 1 AssetAmount
+  +
+  app_local_put
+  int 1
+  store 0
+  b main_l53
+  main_l67:
+  int 0
+  byte "B"
+  app_local_get
+  int 0
+  ==
+  bnz main_l69
+  err
+  main_l69:
+  int 1
+  return
+  main_l70:
+  int 0
+  return
+  main_l71:
+  global GroupSize
+  int 1
+  ==
+  bnz main_l73
+  err
+  main_l73:
+  int 0
+  byte "B"
+  int 0
+  app_local_put
+  int 1
+  return
+  main_l74:
+  byte "U"
+  txna ApplicationArgs 0
+  btoi
+  app_global_put
+  byte "N"
+  txna ApplicationArgs 1
+  btoi
+  app_global_put
+  byte "O"
+  global ZeroAddress
+  app_global_put
+  byte "C"
+  txna Accounts 1
+  app_global_put
+  byte "E"
+  global ZeroAddress
+  app_global_put
+  byte "A"
+  int 0
+  app_global_put
+  byte "B"
+  int 0
+  app_global_put
+  int 1
+  return
+  `;
+  
+  // declare clear state program source
+  let clearProgramSource = `#pragma version 4
+  int 1
+  `;
+  
+  // helper function to compile program source  
+  async function compileProgram(client, programSource) {
+      let encoder = new TextEncoder();
+      let programBytes = encoder.encode(programSource);
+      let compileResponse = await client.compile(programBytes).do();
+      let compiledBytes = new Uint8Array(Buffer.from(compileResponse.result, "base64"));
+      return compiledBytes;
+  }
+  
+  // helper function to await transaction confirmation
+  // Function used to wait for a tx confirmation
+  const waitForConfirmation = async function (algodclient, txId) {
+      let status = (await algodclient.status().do());
+      let lastRound = status["last-round"];
+        while (true) {
+          const pendingInfo = await algodclient.pendingTransactionInformation(txId).do();
+          if (pendingInfo["confirmed-round"] !== null && pendingInfo["confirmed-round"] > 0) {
+            //Got the completed Transaction
+            console.log("Transaction " + txId + " confirmed in round " + pendingInfo["confirmed-round"]);
+            break;
+          }
+          lastRound++;
+          await algodclient.statusAfterBlock(lastRound).do();
+        }
+      };
+  
+  // create new application
+  async function createApp(client, creatorAccount, approvalProgram, clearProgram, localInts, localBytes, globalInts, globalBytes, appArgs, accounts,idgetapp,assetidgets,usdcid) {
+//console.log("idgetting",idget)
+
+    //console.log(Is)
+      // define sender as creator
+      let sender = creatorAccount;      
+      // declare onComplete as NoOp
+      let onComplete = algosdk.OnApplicationComplete.NoOpOC;        
+    // get node suggested parameters
+      let params = await client.getTransactionParams().do();
+      // comment out the next two lines to use suggested fee
+      params.fee = 1000;
+      params.flatFee = true;
+  
+      // create unsigned transaction
+      let txn = algosdk.makeApplicationCreateTxn(sender, params, onComplete, 
+                                              approvalProgram, clearProgram, 
+                                              localInts, localBytes, globalInts, globalBytes, appArgs, accounts);
+      let txId = txn.txID().toString();
+
+      //new 
+
+const txn_b64 = AlgoSigner.encoding.msgpackToBase64(txn.toByte());
+AlgoSigner.signTxn([{txn: txn_b64}])
+.then((d) => {
+let signedTxs = d;
+//signCodeElem.innerHTML = JSON.stringify(d, null, 2);
+AlgoSigner.send({
+ledger: 'TestNet',
+tx: signedTxs[0].blob
+})
+.then(async(d) => {
+let tx = d;
+console.log("trans",tx)
+await waitForConfirmation(client, txId);
+  
+      // display results
+      let transactionResponse = await client.pendingTransactionInformation(txId).do();
+      let appId = transactionResponse['application-index'];
+      console.log("Created new app-id: ",appId);
+
+      //escrow steps 
+
+      
+                    //escrow update application 
+                    (async () => {
+                      const tokenin = {
+                          'X-API-Key': '9oXsQDRlZ97z9mTNNd7JFaVMwhCaBlID2SXUOJWl'
+                         };
+                      const serverin = "https://testnet-algorand.api.purestake.io/ps2";
+                      const portin = "";
+                        let algodclient = new algosdk.Algodv2(tokenin, serverin, portin);
+                        //var fs = require('fs'),
+                        //path = require('path'),
+                        //filePath = path.join(__dirname, 'tealfile.teal');
+                        // filePath = path.join(__dirname, <'fileName'>);
+                        //let data = fs.readFileSync(filePath);
+                        let data = `#pragma version 4
+                    gtxn 0 ApplicationID
+                    int appid                    
+                    ==
+                    gtxn 0 TypeEnum
+                    int appl
+                    ==
+                    &&
+                    txn CloseRemainderTo
+                    global ZeroAddress
+                    ==
+                    &&
+                    txn RekeyTo
+                    global ZeroAddress
+                    ==
+                    &&
+                    bnz main_l2
+                    err
+                    main_l2:
+                    gtxna 0 ApplicationArgs 0
+                    byte "S"
+                    ==
+                    bnz main_l44
+                    gtxna 0 ApplicationArgs 0
+                    byte "B"
+                    ==
+                    bnz main_l41
+                    gtxna 0 ApplicationArgs 0
+                    byte "BN"
+                    ==
+                    bnz main_l24
+                    gtxna 0 ApplicationArgs 0
+                    byte "SN"
+                    ==
+                    bnz main_l9
+                    gtxna 0 ApplicationArgs 0
+                    byte "C"
+                    ==
+                    bnz main_l8
+                    err
+                    main_l8:
+                    int 1
+                    return
+                    main_l9:
+                    global GroupSize
+                    int 4
+                    ==
+                    gtxn 2 TypeEnum
+                    int axfer
+                    ==
+                    &&
+                    gtxn 2 XferAsset
+                    int usdcid //usdc                    
+                    ==
+                    &&
+                    gtxn 2 AssetReceiver
+                    gtxn 0 Sender
+                    ==
+                    &&
+                    bnz main_l11
+                    err
+                    main_l11:
+                    gtxn 3 TypeEnum
+                    int axfer
+                    ==
+                    gtxn 3 XferAsset
+                    int nftid //nft                    
+                    ==
+                    &&
+                    gtxn 3 AssetAmount
+                    int 1
+                    ==
+                    &&
+                    bnz main_l13
+                    err
+                    main_l13:
+                    gtxn 1 TypeEnum
+                    int pay
+                    ==
+                    gtxn 1 Sender
+                    gtxn 0 Sender
+                    ==
+                    &&
+                    bnz main_l15
+                    err
+                    main_l15:
+                    gtxn 3 Sender
+                    gtxn 0 Sender
+                    ==
+                    bnz main_l21
+                    gtxn 3 Sender
+                    gtxn 0 Sender
+                    !=
+                    bnz main_l18
+                    int 0
+                    return
+                    main_l18:
+                    gtxn 1 Amount
+                    gtxn 2 Fee
+                    gtxn 3 Fee
+                    +
+                    >=
+                    bnz main_l20
+                    err
+                    main_l20:
+                    int 1
+                    return
+                    main_l21:
+                    gtxn 1 Amount
+                    gtxn 2 Fee
+                    >=
+                    bnz main_l23
+                    err
+                    main_l23:
+                    int 1
+                    return
+                    main_l24:
+                    gtxn 2 TypeEnum
+                    int axfer
+                    ==
+                    gtxn 2 XferAsset
+                    int usdcid //usdc                  
+                    ==
+                    &&
+                    gtxn 2 AssetReceiver
+                    gtxn 0 Sender
+                    ==
+                    gtxn 2 Sender
+                    gtxn 0 Sender
+                    ==
+                    ||
+                    &&
+                    global GroupSize
+                    int 5
+                    ==
+                    &&
+                    bnz main_l26
+                    err
+                    main_l26:
+                    gtxn 3 TypeEnum
+                    int axfer
+                    ==
+                    gtxn 3 XferAsset
+                    int nftid //nft                    
+                    ==
+                    &&
+                    gtxn 3 AssetAmount
+                    int 1
+                    ==
+                    &&
+                    bnz main_l28
+                    err
+                    main_l28:
+                    gtxn 4 TypeEnum
+                    int axfer
+                    ==
+                    gtxn 4 XferAsset
+                    int usdcid //usdc                    
+                    ==
+                    &&
+                    bnz main_l30
+                    err
+                    main_l30:
+                    gtxn 1 TypeEnum
+                    int pay
+                    ==
+                    gtxn 1 Sender
+                    gtxn 0 Sender
+                    ==
+                    &&
+                    bnz main_l32
+                    err
+                    main_l32:
+                    gtxn 2 Sender
+                    gtxn 0 Sender
+                    ==
+                    bnz main_l38
+                    gtxn 2 AssetReceiver
+                    gtxn 0 Sender
+                    ==
+                    bnz main_l35
+                    int 0
+                    return
+                    main_l35:
+                    gtxn 1 Amount
+                    gtxn 2 Fee
+                    gtxn 3 Fee
+                    +
+                    gtxn 4 Fee
+                    +
+                    >=
+                    bnz main_l37
+                    err
+                    main_l37:
+                    int 1
+                    return
+                    main_l38:
+                    gtxn 1 Amount
+                    gtxn 3 Fee
+                    gtxn 4 Fee
+                    +
+                    >=
+                    bnz main_l40
+                    err
+                    main_l40:
+                    int 1
+                    return
+                    main_l41:
+                    global GroupSize
+                    int 3
+                    ==
+                    gtxn 2 TypeEnum
+                    int axfer
+                    ==
+                    &&
+                    gtxn 2 XferAsset
+                    int usdcid //usdc                    
+                    ==
+                    &&
+                    gtxn 2 AssetReceiver
+                    gtxn 0 Sender
+                    ==
+                    &&
+                    gtxn 1 TypeEnum
+                    int pay
+                    ==
+                    &&
+                    gtxn 1 Sender
+                    gtxn 0 Sender
+                    ==
+                    &&
+                    gtxn 1 Amount
+                    gtxn 2 Fee
+                    >=
+                    &&
+                    bnz main_l43
+                    err
+                    main_l43:
+                    int 1
+                    return
+                    main_l44:
+                    global GroupSize
+                    int 3
+                    ==
+                    gtxn 1 TypeEnum
+                    int pay
+                    ==
+                    &&
+                    gtxn 1 Sender
+                    gtxn 0 Sender
+                    ==
+                    &&
+                    gtxn 1 Amount
+                    gtxn 2 Fee
+                    >=
+                    &&
+                    gtxn 2 TypeEnum
+                    int axfer
+                    ==
+                    &&
+                    gtxn 2 XferAsset
+                    int nftid //nft                    
+                    ==
+                    &&
+                    gtxn 2 AssetAmount
+                    int 1
+                    ==
+                    &&
+                    gtxn 2 AssetReceiver
+                    gtxn 0 Sender
+                    ==
+                    &&
+                    bnz main_l46
+                    err
+                    main_l46:
+                    int 1
+                    return        
+                    `;
+                    let data2 = data.replace("appid",appId);
+                    let data3 = data2.replaceAll("usdcid",usdcid);
+                    let data4 = data3.replaceAll("nftid",idget);
+                    //let results = await algodclient.compile(data4).do();
+                    const sleep = (milliseconds) => {
+                      return new Promise(resolve => setTimeout(resolve, milliseconds))
+                    }
+                        let results = await algodclient.compile(data4).do();
+                        console.log("Resultconsole = " + results);
+                        console.log("Hash = " + results.hash);
+                        console.log("Result = " + results.result);
+                        await sleep(20000)
+                        let program = new Uint8Array(Buffer.from(results.result, "base64"));
+                        let args = [];
+                        args.push(algosdk.encodeUint64(appId));//appid
+                        args.push(algosdk.encodeUint64(usdcid)); //usdc
+                        args.push(algosdk.encodeUint64(idget));//assetid
+                        //args.push(algosdk.encodeUint64(5));
+                        let lsig = algosdk.makeLogicSig(program, args);
+                        //let tealSignPrint = tealSign(sk, data, lsig.address());
+                        console.log("LSIG",lsig.address())
+const algosdkup = require('algosdk');  
+const algodServerup = 'https://testnet-algorand.api.purestake.io/ps2'
+const tokenup = { 'X-API-Key': '9oXsQDRlZ97z9mTNNd7JFaVMwhCaBlID2SXUOJWl' }
+const portup = '';
+let algodClientup = new algosdkup.Algodv2(tokenup, algodServerup, portup);
+
+AlgoSigner.connect()
+.then((d) => {
+
+algodClientup.healthCheck().do()
+.then(d => { 
+
+  AlgoSigner.accounts({
+    ledger: 'TestNet'
+  })
+  .then((d) => {
+    let accountsup = d;
+
+    algodClientup.getTransactionParams().do()
+    .then((d) => {
+      let txParamsJSup = d;
+      const txnup = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
+        from: localStorage.getItem("wallet"),
+        to: lsig.address(),
+        amount: Number(parseInt(400000)),
+        note: undefined,
+        suggestedParams: txParamsJSup
+      });
+    let txn_b64 = AlgoSigner.encoding.msgpackToBase64(txnup.toByte());
+    AlgoSigner.signTxn([{txn: txn_b64}])
+    .then((d) => {
+      let signedTxsup = d;
+      AlgoSigner.send({
+        ledger: 'TestNet',
+        tx: signedTxsup[0].blob
+      })
+      .then((d) => {
+         let txfund = d;
+        //console.log("funded",txfund)
+    
+        //add escrow address in our application and optin escrow usdc and nft
+    
+        (async () => {
+          const tokenesc = {
+              'X-API-Key': '9oXsQDRlZ97z9mTNNd7JFaVMwhCaBlID2SXUOJWl'
+             };
+          const serveresc = "https://testnet-algorand.api.purestake.io/ps2";
+          const portesc = "";
+            let algodclientesc = new algosdk.Algodv2(tokenesc, serveresc, portesc);
+      
+            const waitForConfirmation = async function (algodclient, txId) {
+              let status = (await algodclient.status().do());
+              let lastRound = status["last-round"];
+                while (true) {
+                  const pendingInfo = await algodclient.pendingTransactionInformation(txId).do();
+                  if (pendingInfo["confirmed-round"] !== null && pendingInfo["confirmed-round"] > 0) {
+                    //Got the completed Transaction
+                    console.log("Transaction " + txId + " confirmed in round " + pendingInfo["confirmed-round"]);
+                    break;
+                  }
+                  lastRound++;
+                  await algodclient.statusAfterBlock(lastRound).do();
+                }
+              };
+
+              let data = `#pragma version 4
+              gtxn 0 ApplicationID
+              int appid                    
+              ==
+              gtxn 0 TypeEnum
+              int appl
+              ==
+              &&
+              txn CloseRemainderTo
+              global ZeroAddress
+              ==
+              &&
+              txn RekeyTo
+              global ZeroAddress
+              ==
+              &&
+              bnz main_l2
+              err
+              main_l2:
+              gtxna 0 ApplicationArgs 0
+              byte "S"
+              ==
+              bnz main_l44
+              gtxna 0 ApplicationArgs 0
+              byte "B"
+              ==
+              bnz main_l41
+              gtxna 0 ApplicationArgs 0
+              byte "BN"
+              ==
+              bnz main_l24
+              gtxna 0 ApplicationArgs 0
+              byte "SN"
+              ==
+              bnz main_l9
+              gtxna 0 ApplicationArgs 0
+              byte "C"
+              ==
+              bnz main_l8
+              err
+              main_l8:
+              int 1
+              return
+              main_l9:
+              global GroupSize
+              int 4
+              ==
+              gtxn 2 TypeEnum
+              int axfer
+              ==
+              &&
+              gtxn 2 XferAsset
+              int usdcid //usdc                    
+              ==
+              &&
+              gtxn 2 AssetReceiver
+              gtxn 0 Sender
+              ==
+              &&
+              bnz main_l11
+              err
+              main_l11:
+              gtxn 3 TypeEnum
+              int axfer
+              ==
+              gtxn 3 XferAsset
+              int nftid //nft                    
+              ==
+              &&
+              gtxn 3 AssetAmount
+              int 1
+              ==
+              &&
+              bnz main_l13
+              err
+              main_l13:
+              gtxn 1 TypeEnum
+              int pay
+              ==
+              gtxn 1 Sender
+              gtxn 0 Sender
+              ==
+              &&
+              bnz main_l15
+              err
+              main_l15:
+              gtxn 3 Sender
+              gtxn 0 Sender
+              ==
+              bnz main_l21
+              gtxn 3 Sender
+              gtxn 0 Sender
+              !=
+              bnz main_l18
+              int 0
+              return
+              main_l18:
+              gtxn 1 Amount
+              gtxn 2 Fee
+              gtxn 3 Fee
+              +
+              >=
+              bnz main_l20
+              err
+              main_l20:
+              int 1
+              return
+              main_l21:
+              gtxn 1 Amount
+              gtxn 2 Fee
+              >=
+              bnz main_l23
+              err
+              main_l23:
+              int 1
+              return
+              main_l24:
+              gtxn 2 TypeEnum
+              int axfer
+              ==
+              gtxn 2 XferAsset
+              int usdcid //usdc                  
+              ==
+              &&
+              gtxn 2 AssetReceiver
+              gtxn 0 Sender
+              ==
+              gtxn 2 Sender
+              gtxn 0 Sender
+              ==
+              ||
+              &&
+              global GroupSize
+              int 5
+              ==
+              &&
+              bnz main_l26
+              err
+              main_l26:
+              gtxn 3 TypeEnum
+              int axfer
+              ==
+              gtxn 3 XferAsset
+              int nftid //nft                    
+              ==
+              &&
+              gtxn 3 AssetAmount
+              int 1
+              ==
+              &&
+              bnz main_l28
+              err
+              main_l28:
+              gtxn 4 TypeEnum
+              int axfer
+              ==
+              gtxn 4 XferAsset
+              int usdcid //usdc                    
+              ==
+              &&
+              bnz main_l30
+              err
+              main_l30:
+              gtxn 1 TypeEnum
+              int pay
+              ==
+              gtxn 1 Sender
+              gtxn 0 Sender
+              ==
+              &&
+              bnz main_l32
+              err
+              main_l32:
+              gtxn 2 Sender
+              gtxn 0 Sender
+              ==
+              bnz main_l38
+              gtxn 2 AssetReceiver
+              gtxn 0 Sender
+              ==
+              bnz main_l35
+              int 0
+              return
+              main_l35:
+              gtxn 1 Amount
+              gtxn 2 Fee
+              gtxn 3 Fee
+              +
+              gtxn 4 Fee
+              +
+              >=
+              bnz main_l37
+              err
+              main_l37:
+              int 1
+              return
+              main_l38:
+              gtxn 1 Amount
+              gtxn 3 Fee
+              gtxn 4 Fee
+              +
+              >=
+              bnz main_l40
+              err
+              main_l40:
+              int 1
+              return
+              main_l41:
+              global GroupSize
+              int 3
+              ==
+              gtxn 2 TypeEnum
+              int axfer
+              ==
+              &&
+              gtxn 2 XferAsset
+              int usdcid //usdc                    
+              ==
+              &&
+              gtxn 2 AssetReceiver
+              gtxn 0 Sender
+              ==
+              &&
+              gtxn 1 TypeEnum
+              int pay
+              ==
+              &&
+              gtxn 1 Sender
+              gtxn 0 Sender
+              ==
+              &&
+              gtxn 1 Amount
+              gtxn 2 Fee
+              >=
+              &&
+              bnz main_l43
+              err
+              main_l43:
+              int 1
+              return
+              main_l44:
+              global GroupSize
+              int 3
+              ==
+              gtxn 1 TypeEnum
+              int pay
+              ==
+              &&
+              gtxn 1 Sender
+              gtxn 0 Sender
+              ==
+              &&
+              gtxn 1 Amount
+              gtxn 2 Fee
+              >=
+              &&
+              gtxn 2 TypeEnum
+              int axfer
+              ==
+              &&
+              gtxn 2 XferAsset
+              int nftid //nft                    
+              ==
+              &&
+              gtxn 2 AssetAmount
+              int 1
+              ==
+              &&
+              gtxn 2 AssetReceiver
+              gtxn 0 Sender
+              ==
+              &&
+              bnz main_l46
+              err
+              main_l46:
+              int 1
+              return        
+              `;
+              let data2 = data.replace("appid",appId);
+                    let data3 = data2.replaceAll("usdcid",usdcid);
+                    let data4 = data3.replaceAll("nftid",idget);
+        const sleep = (milliseconds) => {
+          return new Promise(resolve => setTimeout(resolve, milliseconds))
+        }
+            let results = await algodclient.compile(data4).do();
+            console.log("Resultconsole = " + results);
+            console.log("Hash = " + results.hash);
+            console.log("Result = " + results.result);
+            // await sleep(20000)
+            let program = new Uint8Array(Buffer.from(results.result, "base64"));
+            let args = [];
+            args.push(algosdk.encodeUint64(appId));//appid
+            args.push(algosdk.encodeUint64(usdcid)); //usdc
+            args.push(algosdk.encodeUint64(idget));//assetid
+            //args.push(algosdk.encodeUint64(5));
+            let lsig = algosdk.makeLogicSig(program,args);            
+            console.log("LSIG",lsig.address())            
+            console.log("lsig sign", lsig.sign)
+            setlsig(lsig.address())
+            let params = await algodclient.getTransactionParams().do();
+            // comment out the next two lines to use suggested fee
+            params.fee = 1000;
+            params.flatFee = true;
+            let firstAcc;
+            //let creatorAccount = algosdk.mnemonicToSecretKey("output rocket fashion claw define win sudden all purpose wall group idea half chalk caught sound inquiry sheriff conduct burst miracle stand wink about grape");
+      
+      AlgoSigner.connect()
+      .then((d) => {
+        AlgoSigner.accounts({
+          ledger: 'TestNet'
+        })
+        .then(async(d) => {
+          let accounts = d;
+          firstAcc = localStorage.getItem("wallet");
+          let senderCallapp = firstAcc;
+          let index = appId;
+          console.log("creator account", senderCallapp)
+          console.log(lsig.address())
+          let appArgs = [];
+          appArgs.push(new Uint8Array (Buffer.from("C"))); //configuration
+          let accArgs = [];
+          accArgs.push(lsig.address());
+          let tx1 = algosdk.makeApplicationNoOpTxn(senderCallapp, params, index, appArgs, accArgs);
+      
+          let senderTx2 = lsig.address();
+          let receiverTx2 = senderTx2;
+          let nft_id = idget;//assetid
+          let tx2Amount = 0;
+          let closeRemainderTo = undefined;
+          let  revocationTarget = undefined;
+          let note = undefined;
+          //let tx2 = algosdk.makeAssetTransferTxnWithSuggestedParams(senderTx2, receiverTx2, tx2Amount, nft_id, params);
+          let tx2 = algosdk.makeAssetTransferTxnWithSuggestedParams(senderTx2, receiverTx2, closeRemainderTo, revocationTarget, tx2Amount, note, nft_id, params);
+          console.log("after tx2");
+          let senderTx3 = lsig.address();
+          let receiverTx3 = senderTx3;
+          let usdc_id = usdcid;
+          let tx3Amount = 0;
+          let tx3 = algosdk.makeAssetTransferTxnWithSuggestedParams(senderTx3, receiverTx3, closeRemainderTo, revocationTarget, tx2Amount, note, usdc_id, params);
+          console.log("after tx3");
+          console.log("lsig full", lsig.logic);
+          console.log("lsig tag", lsig.tag);
+          //console.log("creator sk", creatorAccount.sk)
+          let txns = [tx1, tx2, tx3];
+            // Group both transactions
+            let txgroup = algosdk.assignGroupID(txns);
+            console.log(txgroup)
+      //changes
+            let txn_b64_1 = tx1.toByte();
+            let txn_b64_2 = tx2.toByte();
+            let txn_b64_3 = tx3.toByte();       
+            let base64Txs1 = AlgoSigner.encoding.msgpackToBase64(txn_b64_1);        
+            let signedTxs = await AlgoSigner.signTxn([
+              {
+                txn: base64Txs1,
+              }
+            ]);
+            console.log("logic",signedTxs)
+            let rawSignedTxn2 = algosdk.signLogicSigTransactionObject(tx2, lsig);
+            let rawSignedTxn3 = algosdk.signLogicSigTransactionObject(tx3, lsig);
+            let binarySignedTxs =  AlgoSigner.encoding.base64ToMsgpack(signedTxs[0].blob);
+            //let binarySignedTxs = signedTxs.map((txn) => AlgoSigner.encoding.base64ToMsgpack(txn[0].blob));
+            let signArr = [binarySignedTxs,rawSignedTxn2.blob, rawSignedTxn3.blob];
+            console.log("signed",rawSignedTxn2.blob)
+            let trans = await algodclient.sendRawTransaction(signArr).do();
+             console.log("Send complete");
+          //   console.log("txID", trans);
+             console.log("id", trans.txId);
+           await waitForConfirmation(algodclient, trans.txId);
+            console.log("signed")
+
+            //db added here
+ 
+    let ref2=fireDb.database().ref(`imagerefAlgo/${localStorage.getItem("wallet")}`);
+    let ref22=fireDb.database().ref(`imagerefAlgolt`);   
+                  let dateset=new Date().toDateString();
+                  console.log("dateget",dateset)
+                  const db = ref2.push().key;                         
+                  const db2 = ref22.push().key;                         
+                  console.log("dbcheck",db)
+                  ref2.child(db).set({id:idgetapp,imageUrl:Img,priceSet:"",cAddress:assetidgets,keyId:db,userName:tname,userSymbol:"ALGOS",
+                  ipfsUrl:Img,ownerAddress:localStorage.getItem("wallet"),soldd:"",extra1:"",previousoaddress:"",datesets:dateset,
+                  whois:'',
+                  league:selected,team:selected2,type:selected3,
+                  teamlogo:selectedImg,dimen:selected4,description:tdescription,history:"",Mnemonic:"",applicationid:appId,usdcids:usdcid,escrowaddress:lsig.address()})
+                  .then(()=>{
+                  ref22.child(db).set({id:idgetapp,imageUrl:Img,priceSet:"",cAddress:assetidgets,keyId:db,
+                  userName:tname,userSymbol:"ALGOS",
+                  ipfsUrl:Img,ownerAddress:localStorage.getItem("wallet"),soldd:"",extra1:"",
+                  previousoaddress:"",datesets:dateset,whois:'',
+                  league:selected,team:selected2,type:selected3,teamlogo:selectedImg,dimen:selected4,
+                  description:tdescription,history:"",Mnemonic:"",applicationid:appId,usdcids:usdcid,escrowaddress:lsig.address()})
+                  .then(()=>{     
+            //add pinata here
+
+            //pinata
+
+//const axios = require('axios');
+let pinataApiKey='88348e7ce84879e143e1';
+let pinataSecretApiKey='e4e8071ff66386726f9fe1aebf2d3235a9f88ceb4468d4be069591eb78d4bf6f';
+const pinataSDK = require('@pinata/sdk');
+const pinata = pinataSDK(pinataApiKey, pinataSecretApiKey);
+            pinata.testAuthentication().then((result) => {
+            //handle successful authentication here
+            console.log(result);  
+            let ge=ipfsHash;
+            console.log("ipfsHash",ipfsHash);
+                    const body = {
+                        message: ge
+                    };
+                    const options = {
+                        pinataMetadata: {
+                            name: tname,
+                            keyvalues: {
+                                customKey: 'customValue',
+                                customKey2: 'customValue2'
+                            }
+                        },
+                        pinataOptions: {
+                            cidVersion: 0
+                        }
+                    };
+                    pinata.pinJSONToIPFS(body, options).then((result) => {
+                        //handle results here
+                        console.log(result);
+                        console.log("jsonresult")
+                        //setVisibleModal(false)
+                        //setIsOpen(true);
+                        //setIsOpens(false)
+                        //setIsOpen(true);
+
+            setIsOpens(false)
+            setIsOpen(true);
+            return appId;
+  
+                      
+                      }).catch((err) => {
+                          //handle error here
+                          console.log(err);
+                      });
+  
+  
+                    }).catch((err) => {
+                        //handle error here
+                        console.log(err);
+                    });
+        
+                    //end pinata
+
+            //end pinata here
+            
+                    
+                  })              
+                  })            
+
+
+            //end db here
+            
+        })
+        .catch((e) => {
+          console.error(e);
+        });
+      })
+      .catch((e) => {
+        console.error(e);
+      });    
+          })().catch(e => {
+            console.error(e);
+        });
+        //end add escrow address in our application and optin escrow usdc and nft
+      })
+      .catch((e) => {
+        console.error(e);
+      });
+    
+    })
+    .catch((e) => {
+        console.error(e);
+    });
+    
+    })
+    .catch((e) => {
+      console.error(e);
+    });
+
+
+    
+
+  })
+  .catch((e) => {
+    console.error(e);
+  });  
+})
+.catch(e => { 
+  console.error(e); 
+});
+  
+})
+.catch((e) => {
+  console.error(e);
+});
+
+
+                    
+                    
+                      })().catch(e => {
+                        console.error(e);
+                    });
+
+
+                    //end escrow update application 
+                    
+                    //pinata
+
+//const axios = require('axios');
+// let pinataApiKey='88348e7ce84879e143e1';
+// let pinataSecretApiKey='e4e8071ff66386726f9fe1aebf2d3235a9f88ceb4468d4be069591eb78d4bf6f';
+// const pinataSDK = require('@pinata/sdk');
+// const pinata = pinataSDK(pinataApiKey, pinataSecretApiKey);
+
+
+//             pinata.testAuthentication().then((result) => {
+//             //handle successful authentication here
+//             console.log(result);
+  
+//             let ge=ipfsHash;
+//             console.log("ipfsHash",ipfsHash);
+//                     const body = {
+//                         message: ge
+//                     };
+//                     const options = {
+//                         pinataMetadata: {
+//                             name: tname,
+//                             keyvalues: {
+//                                 customKey: 'customValue',
+//                                 customKey2: 'customValue2'
+//                             }
+//                         },
+//                         pinataOptions: {
+//                             cidVersion: 0
+//                         }
+//                     };
+//                     pinata.pinJSONToIPFS(body, options).then((result) => {
+//                         //handle results here
+//                         console.log(result);
+//                         console.log("jsonresult")
+//                         //setVisibleModal(false)
+//                         //setIsOpen(true);
+//                         setIsOpens(false)
+//                         setIsOpen(true);
+  
+                      
+//                       }).catch((err) => {
+//                           //handle error here
+//                           console.log(err);
+//                       });
+  
+  
+//                     }).catch((err) => {
+//                         //handle error here
+//                         console.log(err);
+//                     });
+        
+                    //end pinata
+
+    
+      
+//end here escrow steps
+
+      
+})
+.catch((e) => {
+console.error(e);
+});
+
+})
+.catch((e) => {
+console.error(e);
+});
+//end new
+  }
+  
+  async function main() {
+    try {
+    //asset get
+ const algosdkapp = require('algosdk');
+ const portapp = "";  
+const tokenapp = {
+   'X-API-key' : 'SVsJKi8vBM1RwK1HEuwhU20hYmwFJelk8bagKPin',
+ }
+// const baseServerapp = "https://testnet-algorand.api.purestake.io/idx2";    
+ const server = "https://testnet-algorand.api.purestake.io/ps2";
+// let indexerClientapp = new algosdk.Indexer(tokenapp, baseServerapp, portapp);
+// let txnInfo =  await indexerClientapp.searchForTransactions().txid(assetidget).do();    
+// await sleep(10000)  
+// console.log("idp",txnInfo)
+// await sleep(1000)  
+// let idgetapp=txnInfo.transactions[0]["created-asset-index"];
+// await sleep(2000)  
+// console.log("printassetid",idgetapp)
+    // initialize an algodClient
+    let algodClient = new algosdk.Algodv2(tokenapp, server, algodPort);
+    // get accounts from mnemonic
+    //let creatorAccount = algosdk.mnemonicToSecretKey("output rocket fashion claw define win sudden all purpose wall group idea half chalk caught sound inquiry sheriff conduct burst miracle stand wink about grape");
+    //let userAccount = algosdk.mnemonicToSecretKey("leisure pigeon pottery save camera nephew drift unhappy fine town leave nasty mixed soup frog warrior flush save flame bottom senior muffin ship above excite");
+    // compile programs 
+    let approvalProgram = await compileProgram(algodClient, approvalProgramSourceInitial);
+    let clearProgram = await compileProgram(algodClient, clearProgramSource);
+    let accountsarray = [];
+    //let decAddr = algosdk.decodeAddress('ZAAHQ7DV7745I5WXAQPXL4GI4ASAV3KWSWM2IJF3UBWJLEDBDISXY2MCT4');        
+    //let args = ["ZAAHQ7DV7745I5WXAQPXL4GI4ASAV3KWSWM2IJF3UBWJLEDBDISXY2MCT4"];
+    //let program = new Uint8Array(Buffer.from("ZAAHQ7DV7745I5WXAQPXL4GI4ASAV3KWSWM2IJF3UBWJLEDBDISXY2MCT4","base64"));
+    //accountsarray.push(program)        
+    //let appArgs = [];
+    let appArgs = [];
+    let accounts = [];
+    let usdcid = 41069913;
+    console.log("(line:516) appArgs = ",appArgs)
+    appArgs.push(algosdk.encodeUint64(usdcid)); //usdc//10458941
+    appArgs.push(algosdk.encodeUint64(Number(parseInt(idget)))); //nft40789121
+    accounts.push((localStorage.getItem("wallet"))); // account        
+    // create new application
+    let appId = await createApp(algodClient, localStorage.getItem("wallet"), approvalProgram, clearProgram, localInts, localBytes, globalInts, globalBytes, appArgs, accounts,idget,txxid,usdcid);
+    console.log("appid",appId)      
+    //let ts = new Date(new Date().toUTCString());
+    //console.log(ts)               
+    }
+    catch (err){
+        console.log("err", err);  
+    }
+  }
+  
+  //setIsOpens(true)
+  main();
+
+  //end new code added
+
+}
+
+const nocallof=()=>{
+
+  alert("please wait .....")
+}
 
   return (
     <>
-    {/* <h1>create nft in this page</h1> */}
-    {/* <button onClick={()=>filess()} >BuyNow</button>      */}
       <div className={cn("section", styles.section)}>
         <div className={cn("container", styles.container)}>
           <div className={styles.wrapper}>
@@ -1046,11 +2792,8 @@ const callof=()=>{
                 Switch to Multiple
               </button>
             </div>
-            {/* <button type="submit" onClick={onSubmitNFT}>create Nft</button> */}
             <br></br>
-            {/* <button type="submit" onClick={onSubmitImage}> IPFS UPLOAD </button>  */}
-            <form className={styles.form} action="">
-            
+            <form className={styles.form} action="">            
             {/* upload start */}
               <div className={styles.list}>
                 <div className={styles.item}>
@@ -1093,12 +2836,6 @@ const callof=()=>{
                       required
                       onChange={event => setDescription( event.target.value)}
                     />
-
-{/* <div className="col-md-4"> */}
-        {/* <Select onChange={e => setLname(e.target.value)} value={setLname} */}
-              
-              {/* /> */}
-
 <div className={styles.fieldset} >
 <select onChange={changeSelectOptionHandler} style={{width:"100%"}}>
             <option value='Minor League'>Minor League</option>
@@ -1157,105 +2894,10 @@ const callof=()=>{
             <option value='3D'>3D</option>
           </select>
 </div>
-
-        {/* <div className={styles.stage}>Popular</div>
-        <DropdownEmpty
-              className={styles.dropdown}
-              value={Tname}
-              setValue={setTname}
-              options={leaguename}
-              //onChange={changeSelectOptionHandler}
-            /> */}
-      {/* </div> */}
-
 <br></br>
-
-      {/* <div className="col-md-4"> */}
-        {/* <Select options={ teamname } onChange={setTname}/> */}
-      {/* </div> */}
-
-
-{/* <DropDownList data={sizes} /> */}
-
-                    {/* <TextInput
-                      className={styles.field}
-                      label="Your mnemonic key"
-                      name="mnemonic"
-                      type="text"
-                      placeholder='e. g. Alpha Beta Ghama Xerox Black ..."'
-                      required
-                      onChange={event => setMnemonic(event.target.value)}
-                    /> */}
-                    {/* <div className={styles.row}>
-                      <div className={styles.col}>
-                        <div className={styles.field}>
-                          <div className={styles.label}>Royalties</div>
-                          <Dropdown
-                            className={styles.dropdown}
-                            value={royalties}
-                            setValue={setRoyalties}
-                            options={royaltiesOptions}
-                          />
-                        </div>
-                      </div>
-                      <div className={styles.col}>
-                        <TextInput
-                          className={styles.field}
-                          label="Size"
-                          name="Size"
-                          type="text"
-                          placeholder="e. g. Size"
-                          required
-                        />
-                      </div>
-                      <div className={styles.col}>
-                        <TextInput
-                          className={styles.field}
-                          label="Propertie"
-                          name="Propertie"
-                          type="text"
-                          placeholder="e. g. Propertie"
-                          required
-                        />
-                      </div>
-                    </div> */}
                   </div>
                 </div>
               </div>
-              {/* <div className={styles.options}>
-                <div className={styles.option}>
-                  <div className={styles.box}>
-                    <div className={styles.category}>Put on sale</div>
-                    <div className={styles.text}>
-                      You’ll receive bids on this item
-                    </div>
-                  </div>
-                  <Switch value={sale} setValue={setSale} />
-                </div>
-                <div className={styles.option}>
-                  <div className={styles.box}>
-                    <div className={styles.category}>Instant sale price</div>
-                    <div className={styles.text}>
-                      Enter the price for which the item will be instantly sold
-                    </div>
-                  </div>
-                  <Switch value={price} setValue={setPrice} />
-                </div>
-                <div className={styles.option}>
-                  <div className={styles.box}>
-                    <div className={styles.category}>Unlock once purchased</div>
-                    <div className={styles.text}>
-                      Content will be unlocked after successful transaction
-                    </div>
-                  </div>
-                  <Switch value={locking} setValue={setLocking} />
-                </div>
-                <div className={styles.category}>Choose collection</div>
-                <div className={styles.text}>
-                  Choose an exiting collection or create a new one
-                </div>
-                <Cards className={styles.cards} items={items} />
-              </div> */}
               <div className={styles.foot}>              
                 {/* <button
                   className={cn("button-stroke tablet-show", styles.button)}
@@ -1265,18 +2907,32 @@ const callof=()=>{
                   Preview
                 </button>
                  */}
-                <button
+
+                 {Buttonopen ? (
+                   
+                   <button
                   className={cn("button", styles.button)}
                   onClick={() => callof()}
                   // type="button" hide after form customization
                   type="button"                              
-                >
-                  
+                >                  
                   <span>Create item</span>
                   <Icon name="arrow-next" size="10" />
-                </button>
-                
-                    
+                </button>                                              
+
+                 ):(
+
+                  <button
+                  className={cn("button", styles.button)}
+                  onClick={() => nocallof()}
+                  // type="button" hide after form customization
+                  type="button"                              
+                >                  
+                  <span>Create item</span>
+                  <Icon name="arrow-next" size="10" />
+                </button>                                              
+
+                 )}
                 
                 <div className={styles.saving}>
                   <span>Auto saving</span>
@@ -1284,18 +2940,9 @@ const callof=()=>{
                 </div>
               </div>
             </form>
-          </div>
-          {/* <Preview
-            className={cn(styles.preview, { [styles.active]: visiblePreview })}
-            onClose={() => setVisiblePreview(false)}
-          /> */}
+          </div>          
         </div>
       </div>
-      
-      {/* <Modal visible={visibleModal} onClose={() => setVisibleModal(false)}>
-        <FolowSteps className={styles.steps} onSubmitNFT={()=>onSubmitNFT}/>
-      </Modal> */}
-
 <Modald visible={visibleModal} onClose={() => setVisibleModal(false)}>
         <FolowStepsd className={styles.steps} onSubmitNFT={()=>onSubmitNFT}/>
       </Modald>
@@ -1307,21 +2954,16 @@ const callof=()=>{
       <Modald visible={isOpens} >
         <FolowStep className={styles.steps} />
       </Modald>
-
-      {/* onClose={() => setIsOpens(false)} */}
-
       {/* <button
                   className={cn("button", styles.button)}
                   onClick={() => checkurl()}
                   // type="button" hide after form customization
                   type="button"                              
                 >
-                  
+
                   <span>CHECK</span>
                   <Icon name="arrow-next" size="10" />
                 </button> */}
-
-
     </>
   );
 };

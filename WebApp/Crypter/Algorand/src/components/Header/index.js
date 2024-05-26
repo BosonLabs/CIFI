@@ -7,6 +7,7 @@ import Icon from "../Icon";
 import Image from "../Image";
 import Notification from "./Notification";
 import User from "./User";
+import Imagecopy from "../Imagecopy";
 
 
 const nav = [
@@ -39,35 +40,24 @@ const Headers = () => {
   const [search, setSearch] = useState("");
   const [connected, setConnected] = useState(false);
 
-  
-  
-  
-  
-
   const handleSearch = (e) => {
     console.log("inside search bar function")
   };
 
-
-
   useEffect(() => {
     async function isconnected() {
 
-      if(localStorage.getItem("wallet") === null || localStorage.getItem("wallet") === "0x" || localStorage.getItem("wallet") === 'undefined' || localStorage.getItem("wallet") === ''){
-
-      //  console.log("MATICMUMalgo",getalgo)
-      
+      if(localStorage.getItem("wallet") === null || localStorage.getItem("wallet") === "0x" || localStorage.getItem("wallet") === undefined || localStorage.getItem("wallet") === ''){
+      //  console.log("MATICMUMalgo",getalgo)    
       setConnected(false)
-
       }
       else{
-      
+    
         let get=localStorage.getItem("wallet");
-    //let getalgo=localStorage.getItem("walletalgo");
-    console.log("walletcheck",get)
-    //console.log("walletcheckalgo",getalgo)
-    setConnected(true)
-        
+        //let getalgo=localStorage.getItem("walletalgo");
+        console.log("walletcheck",get)
+        //console.log("walletcheckalgo",getalgo)
+        setConnected(true)        
       }
     }
     isconnected();
@@ -119,19 +109,16 @@ const Headers = () => {
 
   return (
     
-    <header className={styles.header}>
-
-      
-      
-      <div className={cn("container", styles.container)}>
-
-      
+    <header className={styles.header}>      
+      <div className={cn("container", styles.container)}>      
         {/* <button type="submit" onClick={()=>{setConnected(!connected)}}>Toggle</button> */}
         <Link className={styles.logo} to="/">
-          <Image
+          <Imagecopy
             className={styles.pic}
-            src="/images/logocifisnew.png"
-            srcDark="/images/logocifis.png"
+            //src="/images/logocifisnew.png"
+            //srcDark="/images/logocifis.png"
+            src="https://cifi-mvp-nest.vercel.app/static/media/cifi.540fecbe.png"
+            srcDark="https://cifi-mvp-nest.vercel.app/static/media/cifi.540fecbe.png"
             alt="Fitness Pro"
           />
         </Link>
@@ -170,8 +157,6 @@ const Headers = () => {
               <Icon name="search" size="20" />
             </button>
           </form>
-
-
           {/* <Link
             className={cn("button-small", styles.button)}
             to="/upload-variants"
@@ -187,13 +172,9 @@ const Headers = () => {
           to="/upload-variants"
         >
           Upload
-        </Link>
-        
-
+        </Link>      
 {
   connected ? 
-
-  
   <Link
   className={cn("button-small", styles.button)}
   to="/connect-wallet"

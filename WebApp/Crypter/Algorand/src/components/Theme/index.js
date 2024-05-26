@@ -3,8 +3,8 @@ import cn from "classnames";
 import styles from "./Theme.module.sass";
 import useDarkMode from "use-dark-mode";
 
-const Theme = ({ className }) => {
-  const darkMode = useDarkMode(false);
+const Theme = ({ className,boo}) => {
+  const darkMode = useDarkMode(true);
 
   return (
     <label
@@ -16,9 +16,10 @@ const Theme = ({ className }) => {
     >
       <input
         className={styles.input}
-        checked={darkMode.value}
+        // checked={darkMode.value}
         onChange={darkMode.toggle}
         type="checkbox"
+        // checked="true"
       />
       <span className={styles.inner}>
         <span className={styles.box}></span>

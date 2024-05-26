@@ -5,7 +5,7 @@ const Image = ({ className, src, srcDark, srcSet, srcSetDark, alt }) => {
   const darkMode = useDarkMode(false);
 
   return (
-    <img
+    <img        
       className={className}
       srcSet={darkMode.value ? srcSetDark : srcSet}
       src={darkMode.value ? srcDark : src}

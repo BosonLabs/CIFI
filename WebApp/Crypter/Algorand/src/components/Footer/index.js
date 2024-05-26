@@ -4,6 +4,8 @@ import cn from "classnames";
 import styles from "./Footer.module.sass";
 import Group from "./Group";
 import Image from "../Image";
+import Imagecopy from "../Imagecopy";
+
 import Form from "../Form";
 import Theme from "../Theme";
 import fireDb from "../../screens/UploadDetails/firebase";
@@ -99,17 +101,19 @@ const Footers = () => {
         <div className={styles.row}>
           <div className={styles.col}>
             <Link className={styles.logo} to="/">
-              <Image
+              <Imagecopy
                 className={styles.pic}
-                src="/images/logocifisnew.png"
-                srcDark="/images/logocifis.png"
+                //src="/images/logocifisnew.png"
+                //srcDark="/images/logocifis.png"
+                src="https://cifi-mvp-nest.vercel.app/static/media/cifi.540fecbe.png"
+                srcDark="https://cifi-mvp-nest.vercel.app/static/media/cifi.540fecbe.png"
                 alt="Fitness Pro"
               />
             </Link>
             <div className={styles.info}>The New Creative Economy.</div>
             <div className={styles.version}>
-              <div className={styles.details}>Dark theme</div>
-              <Theme className="theme-big" />
+              <div className={styles.details}>Light theme</div>
+              <Theme className="theme-big"  boo="true"/>
             </div>
           </div>
           <div className={styles.col}>

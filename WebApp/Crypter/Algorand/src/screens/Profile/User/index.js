@@ -163,21 +163,21 @@ const User = ({ className, item }) => {
         (
         <>
         <div className={styles.avatar}>            
-<img src="/images/logocifis.png" alt="Avatar" />
+<img src="https://cifi-mvp-nest.vercel.app/static/media/cifi.540fecbe.png" alt="Avatar" />
 </div>
         </>):(
           <>
                     { getprodata === "" || getprodata === null ? (
 
 <div className={styles.avatar}>            
-<img src="/images/logocifis.png" alt="Avatar" />
+<img src="https://cifi-mvp-nest.vercel.app/static/media/cifi.540fecbe.png" alt="Avatar" />
 </div>
           ):(
 
             <>
             {getprodata.profileurl === "" || getprodata.profileurl ==="" || getprodata.profileurl ==="aaa" ? (
               <div className={styles.avatar}>            
-<img src="/images/logocifis.png" alt="Avatar" />
+<img src="https://cifi-mvp-nest.vercel.app/static/media/cifi.540fecbe.png" alt="Avatar" />
 </div>
 
             ) :(

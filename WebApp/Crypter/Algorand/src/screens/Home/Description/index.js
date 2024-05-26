@@ -11,12 +11,15 @@ const Description = () => {
       
       <div className={cn("container", styles.container)}>
         <div className={styles.wrap}>
-          <div className={styles.stage}>Save your time with Stacks</div>
+          <div className={styles.stage}>SAVE YOUR TIME WITH CIFI</div>
           <h1 className={cn("h1", styles.title)}>
-            Cifi Token with Cifi-labs
+            {/* Cifi Token with Cifi-labs */}
+            CREATIVE ECONOMY WITH
+            CIFI NETWORK
           </h1>
           <div className={styles.text}>
-            A creative agency that lead and inspire
+            {/* A creative agency that lead and inspire */}
+            A crypto infrastructure platform to lead and inspire cricket enthusiasts
           </div>
           <div className={styles.btns}>
             <Link className={cn("button", styles.button)} to="/upload-variants">
