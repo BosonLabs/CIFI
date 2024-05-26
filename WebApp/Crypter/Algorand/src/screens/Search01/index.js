@@ -7,7 +7,6 @@ import Icon from "../../components/Icon";
 import Dropdown from "../../components/Dropdown";
 import firebase from "../UploadDetails/firebase";
 //UploadDetails/firebase
-
 // data
 //import { bids } from "../../mocks/bids";
 import CardBuy from "../../components/CardBuy";
@@ -33,8 +32,8 @@ const Search = () => {
 
   //const [search, setSearch] = useState("");
   const [values, setValues] = useState([5]);
-  const[getImgreffalgosale,setgetImgreffalgosale]=useState([]);
-  console.log("getImgalgo",getImgreffalgosale)
+  // const[getImgreffalgosale,setgetImgreffalgosale]=useState([]);
+  // console.log("getImgalgo",getImgreffalgosale)
 
   const[getI,setgetI]=useState([]);
   console.log("getImgal",getI)
@@ -45,23 +44,16 @@ const Search = () => {
   
 
   const dbcallsaleal=async(index)=>{
+    console.log("hello ramachandran")
     setActiveIndex(index)
     console.log("inside dbcallsalealgo function")
-
-
-    if(localStorage.getItem("walletalgo") === null || localStorage.getItem("walletalgo") === "0x"){
-
+    if(localStorage.getItem("wallet")  === null || localStorage.getItem("wallet")  === "" || localStorage.getItem("wallet")  === " " || localStorage.getItem("wallet") === 'undefined' || localStorage.getItem("wallet") === '' || localStorage.getItem("wallet") === "0x"){
     }
-    else{
-
-    
-    //let getalgo=localStorage.getItem("walletalgo");
-    //let req = [];
-  
-    // if(getalgo === ""){
-  
+    else{    
+    let getalgo=localStorage.getItem("wallet");
+    //let req = [];  
+    // if(getalgo === ""){  
     // }else{
-
       //let req = [];
     let req2 = [];//imagerefexplore//
     firebase.database().ref("imagerefexploreoneAlgos").on("value", (data) => {
@@ -71,16 +63,12 @@ const Search = () => {
         });        
       }
       
-    });
-    
+    });    
     setgetIm(req2)
-
     let req=[];
-
     getIm.map((a)=>{
       console.log(`abb`, a)    
       Object.keys(a).map((b)=>{
-
         console.log(a[b].id);
                 req.push({
                 title: a[b].id,
@@ -102,7 +90,7 @@ const Search = () => {
                 previousaddress:a[b].previousoaddress,
                 soldd:a[b].soldd,
                 whois:a[b].whois,
-
+                Mnemonic:a[b].Mnemonic,
                 users: [                
                   {
                     avatar: "/images/content/avatar-4.jpg",
@@ -120,77 +108,72 @@ const Search = () => {
 }
   useEffect(()=>{dbcallsaleal()},[])
 
-  const dbcallsalealgo=async()=>{
-    console.log("inside dbcallsalealgo function")
-    
-    let req = [];
-  
-    if(localStorage.getItem("walletalgo") === null || localStorage.getItem("walletalgo") === "0x"){
-  
-    }else{
-  
-    
-      let getalgo=localStorage.getItem("walletalgo");
+  // const dbcallsalealgo=async()=>{
+  //   console.log("inside dbcallsalealgo function")    
+  //   let req = [];  
+  //   if(localStorage.getItem("walletalgo") === null || localStorage.getItem("walletalgo") === "0x"){  
+  //   }else{      
+  //     let getalgo=localStorage.getItem("walletalgo");
       
-      //let kreq =[];
-      firebase.database().ref("imagerefexploreoneAlgos").child(getalgo).on("value", (data) => {
-        if (data) {
-          data.forEach((d) => {
-            //console.log("keycheck",d.key)
-            let value=d.val();
-            req.push(
+  //     //let kreq =[];
+  //     firebase.database().ref("imagerefexploreoneAlgos").child(getalgo).on("value", (data) => {
+  //       if (data) {
+  //         data.forEach((d) => {
+  //           //console.log("keycheck",d.key)
+  //           let value=d.val();
+  //           req.push(
               
-              {
-              title: value.id,
-              price: value.priceSet,
-              highestBid: value.keyId,
-              counter:value.userName ,
-              //bid: 'New bid <span role="img" aria-label="fire">🔥</span>',
-              bid:value.ownerAddress,
-              image: value.imageUrl,
-              image2x: value.paramsdb,
-              category: value.privatekey,
-              categoryText: value.cAddress,
-              //purchasing !
-              url: value.history,
-              date:value.datesets,
-              description:value.description,
-              extra:value.extra1,
-              ipfsurl:value.ipfsUrl,
-              previousaddress:value.previousoaddress,
-              soldd:value.soldd,
-              whois:value.whois,
-              users: [                
-                {
-                  avatar: "/images/content/avatar-4.jpg",
-                },
-              ],
-              },
+  //             {
+  //             title: value.id,
+  //             price: value.priceSet,
+  //             highestBid: value.keyId,
+  //             counter:value.userName ,
+  //             //bid: 'New bid <span role="img" aria-label="fire">🔥</span>',
+  //             bid:value.ownerAddress,
+  //             image: value.imageUrl,
+  //             image2x: value.paramsdb,
+  //             category: value.privatekey,
+  //             categoryText: value.cAddress,
+  //             //purchasing !
+  //             url: value.history,
+  //             date:value.datesets,
+  //             description:value.description,
+  //             extra:value.extra1,
+  //             ipfsurl:value.ipfsUrl,
+  //             previousaddress:value.previousoaddress,
+  //             soldd:value.soldd,
+  //             whois:value.whois,
+  //             users: [                
+  //               {
+  //                 avatar: "/images/content/avatar-4.jpg",
+  //               },
+  //             ],
+  //             },
             
-            )
-          });        
-        }
-      });
-      setgetImgreffalgosale(req);
+  //           )
+  //         });        
+  //       }
+  //     });
+  //     setgetImgreffalgosale(req);
     
-    }
-    console.log("acc",getImgreffalgosale)
+  //   }
+  //   console.log("acc",getImgreffalgosale)
   
-  }
+  // }
   
-  useEffect(()=>{dbcallsalealgo()},[])
+  // useEffect(()=>{dbcallsalealgo()},[])
   
 
-  const handleSubmit = (e) => {
+  // const handleSubmit = (e) => {
 
-    if(searchTerm === '') return getI
-    let data= getI.filter((val)=>{
-      return val.counter.toLowerCase().trim().includes(searchTerm.toLowerCase().trim())
+  //   if(searchTerm === '') return getI
+  //   let data= getI.filter((val)=>{
+  //     return val.counter.toLowerCase().trim().includes(searchTerm.toLowerCase().trim())
       
-    })
-    //console.log('returndata',data)
-    return data;    
-  };
+  //   })
+  //   //console.log('returndata',data)
+  //   return data;    
+  // };
 
   const STEP = 0.1;
   const MIN = 0.01;
@@ -250,27 +233,19 @@ const Search = () => {
             />
           </div>
           <div className={styles.nav}>
-            {navLinks.map((x, index) => (
-                         
-              
+            {navLinks.map((x, index) => (                                       
               <button
                 className={cn(styles.link, {
                   [styles.active]: index === activeIndex,
-                })}
-                
-                
-                onClick={() =>
-                  
+                })}                                
+                onClick={() =>                  
                   //console.log("index",index)
                   dbcallsaleal(index)
                 }
                 key={index}
               >
                 {x}
-              </button>
-
-              
-              
+              </button>                          
             ))}
           </div>
         </div>
@@ -390,7 +365,7 @@ const Search = () => {
           <div className={styles.wrapper}>
             <div className={styles.list}>
               
-              {handleSubmit().map((x, index) => (                              
+              {getI.map((x, index) => (                              
                 <CardBuy className={styles.card} item={x} key={index} />                
               ))}
             </div>

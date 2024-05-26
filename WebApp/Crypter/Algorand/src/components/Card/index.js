@@ -1,4 +1,4 @@
-// /* global AlgoSigner */
+/* global AlgoSigner */
 import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
 import cn from "classnames";
@@ -38,12 +38,12 @@ const Card = ({ className, item }) => {
     //let getalgo=localStorage.getItem("wallet");
     //const accounts = await  web3.eth.getAccounts();
 
-    if(localStorage.getItem("walletalgo") === null || localStorage.getItem("walletalgo") === "0x"){
+    if(localStorage.getItem("wallet") === null || localStorage.getItem("wallet") === "0x" || localStorage.getItem("wallet") === undefined || localStorage.getItem("wallet") === ''){
 
     }else{
 
     
-    let getalgo=localStorage.getItem("walletalgo");
+    let getalgo=localStorage.getItem("wallet");
     console.log("addlikedb function call");
 
     
@@ -52,7 +52,7 @@ const Card = ({ className, item }) => {
       userName:item.counter,userSymbol:"Algos",ipfsUrl:item.ipfsurl,
       ownerAddress:item.bid,soldd:item.soldd,extra1:item.extra,
       previousoaddress:item.previousaddress,datesets:item.date,
-      description:item.description,whois:'likes',history:item.url
+      description:item.description,whois:'likes',history:item.url,Mnemonic:item.Mnemonic
       //,paramsdb:item.image2x,privatekey:item.category
       }).then(()=>{
         setVisible(!visible)
@@ -82,12 +82,12 @@ const Card = ({ className, item }) => {
       //let tokenname;
       //let getAssetid;
 
-      if(localStorage.getItem("walletalgo") === null || localStorage.getItem("walletalgo") === "0x"){
+      if(localStorage.getItem("wallet") === null || localStorage.getItem("wallet") === "0x" || localStorage.getItem("wallet") === undefined || localStorage.getItem("wallet") === ''){
 
       }
     else{
       //const accounts = await  web3.eth.getAccounts();
-      let getalgo=localStorage.getItem("walletalgo");
+      let getalgo=localStorage.getItem("wallet");
       console.log("1",item.bid)
       console.log("2",item.highestBid)
       console.log("3",item.category)
@@ -119,7 +119,7 @@ const Card = ({ className, item }) => {
         userName:item.counter,userSymbol:"Algos",ipfsUrl:item.ipfsurl,
         ownerAddress:item.bid,soldd:item.soldd,extra1:item.extra,
         previousoaddress:item.previousaddress,datesets:item.date,
-        description:item.description,whois:'readytosale',history:item.url
+        description:item.description,whois:'readytosale',history:item.url,Mnemonic:item.Mnemonic
       }).then(()=>{
         fireDb.database().ref(`imagerefAlgo/${getalgo}`).child(item.highestBid).remove();
           console.log("remove db");
@@ -187,23 +187,21 @@ const Card = ({ className, item }) => {
 
   const setpricedb=async()=>{
 
-    if(localStorage.getItem("walletalgo") === null || localStorage.getItem("walletalgo") === "0x"){
+    if(localStorage.getItem("wallet") === null || localStorage.getItem("wallet") === "0x" || localStorage.getItem("wallet") === undefined || localStorage.getItem("wallet") === ''){
 
+      alert("nothing")
     }
-    else{
-
-    
-
-    let getalgo=localStorage.getItem("walletalgo");
+    else{  
+    let getalgo=localStorage.getItem("wallet");
 
     //let getprize = prompt("Please enter Price");
     if( urlprize === ""){
       //getprize = prompt("Please enter Price");
-
       alert("please enter Algos ?")
     }
 else{
-
+console.log("checkowner",item.bid)
+console.log("checkowners",getalgo)
   if(getalgo === item.bid)
   {
     const algosdk = require('algosdk');
@@ -223,38 +221,180 @@ else{
       console.log("assetidget",txnInfo.transactions[0]["created-asset-index"])  
       console.log("end")  
       console.log("setitem",item)
-    console.log("settitem",item.price)
-    let checkdb=fireDb.database().ref(`imagerefAlgo/${item.bid}`).child(item.highestBid);
-    console.log("cdb",checkdb)
-    console.log("odb",item.bid)
-    console.log("hdb",item.highestBid)
-
-
-    fireDb.database().ref(`imagerefAlgo/${getalgo}`).child(item.highestBid).update({
-
-      id:idget,imageUrl:item.image,priceSet:urlprize,cAddress:item.categoryText,keyId:item.highestBid,
-        userName:item.counter,userSymbol:"Algos",ipfsUrl:item.ipfsurl,
-        ownerAddress:item.bid,soldd:item.soldd,extra1:item.extra,
-        previousoaddress:item.previousaddress,datesets:item.date,
-        description:item.description,whois:'readytosale',history:item.url
-
-
-    }).then(()=>{
-  
-      setIsOpens(false);
-    setIsOpenss(true)
+      console.log("settitem",item.price)
+      //let program = new Uint8Array(Buffer.from("AyAEAwHFxKUO6AcyBCISRDMBECMSRDMCEiMSRDMCESQSRDMCASUORDMCFTIDEkQzAiAyAxJEI0M=", "base64"));
+    let program = new Uint8Array(Buffer.from("AiAHewYBBAAFAyYFAVMBQgJCTgJTTgFDMwAYIhIzABAjEhAxCTIDEhAxIDIDEhBAAAEANwAaACgSQAFrNwAaACkSQAEtNwAaACoSQACNNwAaACsSQAANNwAaACcEEkAAAQAkQzIEJRIzAhAlEhAzAhEiEhAzAhQzAAASEEAAAQAzAxAlEjMDESISEDMDEiQSEEAAAQAzARAkEjMBADMAABIQQAABADMDADMAABJBAA0zAQgzAgEPQAABACRDMwMAMwAAE0EAETMBCDMCATMDAQgPQAABACRDIQRDMwIQJRIzAhEiEhAzAhQzAAASMwIAMwAAEhEQMgQhBRIQQAABADMDECUSMwMRIhIQMwMSJBIQQAABADMEECUSMwQRIhIQQAABADMBECQSMwEAMwAAEhBAAAEAMwIAMwAAEkEAETMBCDMDATMEAQgPQAABACRDMwIUMwAAEkEAFTMBCDMCATMDAQgzBAEID0AAAQAkQyEEQzIEIQYSMwIQJRIQMwIRIhIQMwIUMwAAEhAzARAkEhAzAQAzAAASEDMBCDMCAQ8QQAABACRDMgQhBhIzARAkEhAzAQAzAAASEDMBCDMCAQ8QMwIQJRIQMwIRIhIQMwISJBIQMwIUMwAAEhBAAAEAJEM=", "base64"));
+    const args=[];
+    args.push([...Buffer.from(idget.toString())]);
+    //args.push([...Buffer.from(addr2)]);
+    //args.push([...Buffer.from('')]);
     
-  
-    })
+    let lsig = algosdk.makeLogicSig(program,args);
 
+      AlgoSigner.accounts({
+        ledger: 'TestNet'
+      })
+      .then((d) => {
+        let accounts = d;
+      
+    const algosdk = require('algosdk');
+    const algodServer = 'https://testnet-algorand.api.purestake.io/ps2'
+    const indexerServer = 'https://testnet-algorand.api.purestake.io/idx2'
+    const token = { 'X-API-Key': 'SVsJKi8vBM1RwK1HEuwhU20hYmwFJelk8bagKPin' }
+    const port = '';
+    let note = undefined;
+
+   let algodClient = new algosdk.Algodv2(token, algodServer, port);
+
+   
+    algodClient.getTransactionParams().do()
+    .then((d) => {
+      let txParamsJS = d;
+      //document.getElementById('paramsprint').innerHTML = JSON.stringify(d);
+      const txn = algosdk.makeAssetTransferTxnWithSuggestedParamsFromObject({
+        from: accounts[0].address,
+        to: lsig.address(),
+        assetIndex: parseInt(idget),
+        note: AlgoSigner.encoding.stringToByteArray("hello"),
+        amount: 0,
+        suggestedParams: {...txParamsJS}
+      });
+      
+      // Use the AlgoSigner encoding library to make the transactions base64
+      const txn_b64 = AlgoSigner.encoding.msgpackToBase64(txn.toByte());
+      
+      AlgoSigner.signTxn([{txn: txn_b64}]) 
+      .then((d) => {
+        let signedTxs = d;
+        //signCodeElem.innerHTML = JSON.stringify(d, null, 2);
+        AlgoSigner.send({
+            ledger: 'TestNet',
+            tx: signedTxs[0].blob
+          })
+          .then((d) => {
+            let tx = d;
+            //document.getElementById('opt').innerHTML = JSON.stringify(d);
+
+            fireDb.database().ref(`imagerefAlgo/${getalgo}`).child(item.highestBid).update({
+              id:idget,imageUrl:item.image,priceSet:urlprize,cAddress:item.categoryText,keyId:item.highestBid,
+                userName:item.counter,userSymbol:"Algos",ipfsUrl:item.ipfsurl,
+                ownerAddress:item.bid,soldd:item.soldd,extra1:item.extra,
+                previousoaddress:item.previousaddress,datesets:item.date,
+                description:item.description,whois:'readytosale',history:item.url,Mnemonic:item.Mnemonic
+        
+            }).then(()=>{  
+              setIsOpens(false);
+            setIsOpenss(true)    
+            })
+
+          })
+          .catch((e) => {
+            console.error(e);
+          });
+
+      })
+      .catch((e) => {
+        console.error(e);
+      });
+    })
+    .catch((e) => {
+      console.error(e);
+    })    
+})
+.catch((e) => {
+  console.error(e);
+});
+
+
+      
+// AlgoSigner.connect()
+// .then((d) => {
+
+//   const algosdk = require('algosdk');
+//      const algodServer = 'https://testnet-algorand.api.purestake.io/ps2'
+//      const indexerServer = 'https://testnet-algorand.api.purestake.io/idx2'
+//      const token = { 'X-API-Key': 'SVsJKi8vBM1RwK1HEuwhU20hYmwFJelk8bagKPin' }
+//      const port = '';
+
+//     let algodClient = new algosdk.Algodv2(token, algodServer, port);
+//     algodClient.healthCheck().do()
+// .then(d => { 
+  
+//   AlgoSigner.accounts({
+//     ledger: 'TestNet'
+//   })
+//   .then((d) => {
+//     let accounts = d;
+//     algodClient.getTransactionParams().do()
+// .then((d) => {
+//   var recoveredAccount1 = algosdk.mnemonicToSecretKey(item.Mnemonic);
+//   let txParamsJS = d;
+//   const txn = algosdk.makeAssetTransferTxnWithSuggestedParamsFromObject({
+//     from: accounts[0].address,
+//     to: recoveredAccount1.addr,
+//     assetIndex: +parseInt(idget),
+//     note: AlgoSigner.encoding.stringToByteArray("nothing"),
+//     amount: 0,
+//     suggestedParams: {...txParamsJS}
+//   });
+  
+//   // Use the AlgoSigner encoding library to make the transactions base64
+//   const txn_b64 = AlgoSigner.encoding.msgpackToBase64(txn.toByte());
+  
+//   AlgoSigner.signTxn([{txn: txn_b64}]) 
+//   .then((d) => {
+//     let signedTxs = d;
+//     //signCodeElem.innerHTML = JSON.stringify(d, null, 2);
+
+//     AlgoSigner.send({
+//       ledger: 'TestNet',
+//       tx: signedTxs[0].blob
+//     })
+//     .then((d) => {
+//       let tx = d;
+
+
+//       //transfer thiru     
+//       //end thiru
+
+//       //db here
+
+//       let checkdb=fireDb.database().ref(`imagerefAlgo/${item.bid}`).child(item.highestBid);
+//     console.log("cdb",checkdb)
+//     console.log("odb",item.bid)
+//     console.log("hdb",item.highestBid)
+
+
+    
+
+//     })
+//     .catch((e) => {
+//       console.error(e);
+//     });
+//   })
+//   .catch((e) => {
+//     console.error(e);
+//   });
+// })
+// .catch((e) => {
+//   console.error(e);
+// });
+//   })
+//   .catch((e) => {
+//     console.error(e);
+//   });
+// })
+// .catch(e => { 
+//   console.error(e); 
+// });
+  
+// })
+// .catch((e) => {
+//   console.error(e);
+// });    
     })().catch(e => {
         console.log(e);
     });
-
-    
-
-    
-
   }
 
   else{

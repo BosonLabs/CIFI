@@ -15,6 +15,7 @@ import Compress from "react-image-file-resizer";
 //import Itemssss from "../ProfileCopy/Itemssss";
 //import Popup from "../ConnectWallet/Popup"
 //import axios from 'axios';
+//import mnemonic from 'algosdk';
 
 import Modald from "../../components/ModalD";
 import FolowStepsd from "../ConnectWallet/FolowStepsd";
@@ -281,6 +282,7 @@ const dbcollection=async()=>{
                 type:value.type,
                 teamlogo:value.teamlogo,
                 dimen:value.dimen,
+                Mnemonic:value.Mnemonic,
                 users: [                
                   {
                     avatar: "/images/content/avatar-4.jpg",
@@ -348,6 +350,7 @@ const dbcollection2=async()=>{
                 type:value.type,
                 teamlogo:value.teamlogo,
                 dimen:value.dimen,
+                Mnemonic:value.Mnemonic,
                 users: [                
                   {
                     avatar: "/images/content/avatar-4.jpg",
@@ -418,6 +421,7 @@ const dbcollection3=async()=>{
                 type:value.type,
                 teamlogo:value.teamlogo,
                 dimen:value.dimen,
+                Mnemonic:value.Mnemonic,
                 users: [                
                   {
                     avatar: "/images/content/avatar-4.jpg",
@@ -488,6 +492,7 @@ const dbcollection4=async()=>{
                 teamlogo:value.teamlogo,
                 dimen:value.dimen,
                 soldd:"",
+                Mnemonic:value.Mnemonic,
                 users: [                
                   {
                     avatar: "/images/content/avatar-4.jpg",
@@ -559,6 +564,7 @@ const dbcallalgolikes=async()=>{
               date:value.datesets,
               description:value.description,
               soldd:"",
+              Mnemonic:value.Mnemonic,
               users: [                
                 {
                   avatar: "/images/content/avatar-4.jpg",
@@ -633,7 +639,7 @@ const dbcallsalealgo=async()=>{
   
   let req = [];
 
-  if(localStorage.getItem("wallet")  === null || localStorage.getItem("wallet")  === "" || localStorage.getItem("wallet")  === " " || localStorage.getItem("wallet") === 'undefined' || localStorage.getItem("wallet") === ''){
+  if(localStorage.getItem("wallet")  === null || localStorage.getItem("wallet")  === "" || localStorage.getItem("wallet")  === " " || localStorage.getItem("wallet") === 'undefined' || localStorage.getItem("wallet") === '' || localStorage.getItem("wallet") === "0x"){
 
   }else{
 
@@ -670,6 +676,7 @@ const dbcallsalealgo=async()=>{
               date:value.datesets,
               description:value.description,
               soldd:"",
+              Mnemonic:value.Mnemonic,
               users: [                
                 {
                   avatar: "/images/content/avatar-4.jpg",
@@ -734,6 +741,7 @@ const dbcallalgo=async()=>{
               description:value.description,
               soldd:"",
               history:"",
+              Mnemonic:value.Mnemonic,
               users: [                
                 {
                   avatar: "/images/content/avatar-4.jpg",
@@ -774,7 +782,7 @@ const dbcallalgobuy=async()=>{
     let getalgo=localStorage.getItem("wallet");
     
     //let kreq =[];
-    firebase.database().ref("imagerefAlgobuy").child(getalgo).on("value", (data) => {
+    firebase.database().ref("imagerefbuy").child(getalgo).on("value", (data) => {
 
       
       if (data) {
@@ -806,6 +814,7 @@ const dbcallalgobuy=async()=>{
               previousaddress:value.previousoaddress,
               date:value.datesets,
               description:value.description,
+              Mnemonic:value.Mnemonic,
               users: [                
                 {
                   avatar: "/images/content/avatar-4.jpg",
@@ -989,7 +998,17 @@ const convertToBuffer = async(reader) => {
 
 const checkasset=()=>{
 //setIsOpen(true)
-firebase.database().ref("algorandData").remove();
+//firebase.database().ref("algorandData").remove();
+
+alert("check ")
+
+let program = new Uint8Array(Buffer.from("+FItTCe6NXWiIccpPYbgJAHkfDr1+AdNIx8B+YOvlGgIM3fchnlh9NXZ+HNMK34l1xBYX2ANt2pPHZlRYGyKxA==", "base64"));
+console.log("programop",program)
+
+//let mnem = mnemonic.from_private_key('+FItTCe6NXWiIccpPYbgJAHkfDr1+AdNIx8B+YOvlGgIM3fchnlh9NXZ+HNMK34l1xBYX2ANt2pPHZlRYGyKxA==')
+// print("Mneumonic : ",mnem)
+
+//alert(mnem)
 }
 
  const togglePopup = () => {
