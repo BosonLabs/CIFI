@@ -316,7 +316,8 @@ async function main() {
     // get accounts from mnemonic
     let creatorAccount = algosdk.mnemonicToSecretKey("bitter never rather carry picture firm rare gloom repeat truck volume surprise candy thumb parent side before popular turtle analyst similar vehicle gas absent public");
     let userAccount = algosdk.mnemonicToSecretKey("unique urban normal exchange shrimp inspire steel domain family cheap sea river input credit embark day organ dune try squeeze subject trial can about fault");
-   
+   let userAddress =[];
+   userAddress =["K3ASZETXZ47FOFEEDG7WVU4PNFOTKE32HFWAE7ODFLUUYAYVKDBJRWLRV4","4BLKKSIOUAC3TYFS2KQR4HDFZE6CWYZTDJXHHGDROACPNSJXGTHHY6I6GM"];
     // compile programs 
     // let approvalProgram = await compileProgram(algodClient, approvalProgramSourceInitial);
     // let clearProgram = await compileProgram(algodClient, clearProgramSource);
@@ -335,7 +336,23 @@ let accounts;
       .then(async (d) => {
         accounts = d;
         let amount = 1000000;
-        await callApp(accounts[1].address, appId , amount);
+        let acc = accounts[0].address;
+        let length = userAddress.length;
+        let confirm ;
+        console.log("length",userAddress.length)
+        for(let i=0;i<2;i++){
+          if(userAddress[i]==acc)
+          {
+            await callApp(accounts[1].address, appId , amount);
+          }
+          else{
+            confirm = 1;
+          }
+        }
+      if(confirm == 1){
+        alert("Not able to donate");
+      }
+        
       })
       .catch((e) => {
         console.error(e);
