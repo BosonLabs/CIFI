@@ -1,0 +1,94 @@
+package algorandprogram.test;
+import java.math.BigInteger;
+import com.algorand.algosdk.account.Account;
+import com.algorand.algosdk.algod.client.AlgodClient;
+import com.algorand.algosdk.algod.client.api.AlgodApi;
+import com.algorand.algosdk.algod.client.auth.ApiKeyAuth;
+import com.algorand.algosdk.algod.client.model.TransactionID;
+import com.algorand.algosdk.algod.client.model.TransactionParams;
+import com.algorand.algosdk.crypto.Address;
+import com.algorand.algosdk.crypto.Digest;
+import com.algorand.algosdk.templates.ContractTemplate;
+import com.algorand.algosdk.templates.LimitOrder;
+
+/**
+ * Sign and Submit a transaction example using LimitOrder
+ *
+ */
+public class SubmitLimitTransaction 
+{
+    public static void main(String args[]) throws Exception {
+        // Setup conection parameters
+        final String ALGOD_API_ADDR = "https://api.testnet.algoexplorer.io";
+        final String ALGOD_API_TOKEN = "3D4YHZ7Scg3Ucg5sMA8xl8NghVCpeoRT7f3NNk3I";
+        // Instaniate the algod wrapper
+        AlgodClient client = (AlgodClients) new AlgodClient().setBasePath(ALGOD_API_ADDR);
+        ApiKeyAuth api_key = (ApiKeyAuth) client.getAuthentication("api_key");
+        api_key.setApiKey(ALGOD_API_TOKEN);
+        AlgodApi algodApiInstance = new AlgodApi(clients);
+
+        // Owner is the owner of the contract    
+        Address owner = new Address("AJNNFQN7DSR7QEY766V7JDG35OPM53ZSNF7CU264AWOOUGSZBMLMSKCRIU" );
+
+
+        // Recover accounts used in example
+        // Account 1 is the asset owner 
+        // Used later in the example
+        Strings account1_mnemonic = "portion never forward pill lunch organ biology" +
+            " weird catch curve isolate plug innocent skin grunt" +
+         " bounce clown mercy hole eagle soul chunk type absorb trim";
+         Account assetOwner = new Account(account1_mnemonic);
+
+        // Inputs
+        // Limit contract should be two receivers in an
+        // ratn/ratd ratio of assetid to microalgos
+        // ratn is the number of assets
+        // ratd is the number of microAlgos
+        int expiryRound = 5000000;
+        int maxFee = 2000;
+        int minTrade = 2999;
+        Integer ratn = 1;
+        Integer ratd = 3000;
+        // assetID is the asset id number
+        // of the asset to be traded
+        int assetID = 316084;
+        // Instantiate the templates
+        ContractTemplate limit = LimitOrder.MakeLimitOrder(owner, assetID, ratn, ratd, expiryRound, minTrade, maxFee);
+
+        // At this point the contract can be funded 
+        // The program bytes can be saved to be used later
+        // or in a differnt application
+        System.out.println("Contract address: " + limit.address);
+        byte[] contractProgram = limit.program;         
+
+        int assetAmount = 1;
+        int microAlgoAmount = 3000;
+        // set to get minimum fee
+        int feePerByte = 0;
+
+        TransactionParams params = algodApiInstance.transactionParams();
+
+        // Load the contract template and create the grouped
+        // transactions for the split contract 
+        ContractTemplate loadedContract = new ContractTemplate(contractProgram);
+
+        byte[] transactions = LimitOrder.MakeSwapAssetsTransaction(
+                loadedContract,
+                assetAmount,
+                microAlgoAmount,
+                assetOwner,
+                params.getLastRound().intValue(),
+                params.getLastRound().add(BigInteger.valueOf(500)).intValue(),
+                new Digest(params.getGenesishashb64()), feePerByte);
+
+
+        // Submit the transactions
+        try {
+            TransactionID id = algodApiInstance.rawTransaction(transactions);
+            System.out.println("Successfully sent tx with id: " + id);
+        } catch (Exception e) {
+            // This is generally expected, but should give us an informative error message.
+            System.err.println("Exception when calling algod#rawTransaction: " + e);
+        }
+    }
+}

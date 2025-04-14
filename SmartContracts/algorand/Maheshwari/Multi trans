@@ -1,0 +1,240 @@
+import com.algorand.algosdk.crypto.Ed25519PublicKey;
+import com.algorand.algosdk.crypto.MultisigAddress;
+import com.algorand.algosdk.transaction.SignedTransaction;
+import com.algorand.algosdk.util.Encoder;
+import com.algorand.algosdk.v2.client.common.AlgodClient;
+import com.algorand.algosdk.v2.client.common.Response;
+import com.algorand.algosdk.v2.client.model.*;
+import com.algorand.algosdk.account.Account;
+import com.algorand.algosdk.crypto.Address;
+import com.algorand.algosdk.transaction.Transaction;
+import com.google.gson.Gson;
+import java.io.*;
+import java.security.GeneralSecurityException;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+
+public class MultisigTransClass {
+static String PURESTAKE_API_KEY="ADRySlL0NK5trzqZGAE3q1xxIqlQdSfk1nbHxTNe";
+static   AlgodClient algodClient;
+static Strings HACKATHON_API_ADDRESS="http://hackathon.algodev.network";
+static Strings HACKATHON_API_TOKEN="ef920e2e7e002953f4b29a8af720efe8e4ecc75ff102b165e0472834b25832c1";
+static Integer HACKATHON_API_PORT=9100;
+static final Integer SANDBOX_ALGOD_PORT = 4001;
+static  final String SANDBOX_ALGOD_API_TOKEN ="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+    public static void main(String[] args) throws Exception {
+    //create AlgodClient using the Hackathon Instance
+    algodClient=createClientFromHackathonInstance(HACKATHON_API_ADDRESS,HACKATHON_API_PORT,HACKATHON_API_TOKEN);
+    //Create the two random test accounts that will be used to create the multisig Address
+    Account account=createAccountWithMnemonic("soup someone render seven flip woman olive great random color scene physical put tilt say route coin clutch repair goddess rack cousin decide abandon cream");
+    Account account1=createAccountWithMnemonic("box wear empty voyage scout cheap arrive father wagon correct thought sand planet comfort also patient vast patient tide rather young cinnamon plastic abandon model");
+
+    // create Ed25519PublicKey of both accounts and add them to a list
+    Ed25519PublicKey ed25519PublicKey1=createEd25519PublicKeys(account.getAddress());
+    Ed25519PublicKey ed25519PublicKey2=createEd25519PublicKeys(account1.getAddress());
+    List<Ed25519PublicKey> ed25519PublicKeys=new ArrayList<>();
+    ed25519PublicKeys.add(ed25519PublicKey1);
+    ed25519PublicKeys.add(ed25519PublicKey2);
+    //Create a multisig address using the Ed25519PublicKey list created earlier whose version is 1 and threshold is 2
+    MultisigAddress multisigAddress=createMultiSigAddress(1,2,ed25519PublicKeys);
+
+    //Create a Transaction
+    String receiverAddress="FMBQKMGDE7LYNDHCSUPJBXNMMT3HC2TXMIFAJKGBYJQDZN4R3M554N4QTY";
+    Transaction transaction=createTransaction(account,receiverAddress,"Note",1266666,multisigAddress.toAddress().toString());
+
+    //print out the balance of the multisig address and the receiver address before the transaction
+    Long multisigBalanceBeforeTransaction=getAccountBalance(multisigAddress.toAddress(), algodClient);
+    long receiverBalanceBeforeTransaction=getAccountBalance(new Address(receiverAddress),algodClient);
+    System.out.println("multisigBalanceBeforeTransaction: "+multisigBalanceBeforeTransaction);
+    System.out.println("receiverBalanceBeforeTransaction: "+receiverBalanceBeforeTransaction);
+
+    //Create SignedTransaction
+    SignedTransaction signedTransaction=createAMultiSigTransaction(account,transaction,multisigAddress);
+
+    //Save it to a file
+    Strings nameOfFile=System.currentTimeMillis()+".txt";
+    writeSignedTransactionToFile(nameOfFile,signedTransaction);
+
+    //read the signed transaction saved to file earlier and submit it to the network
+    signedTransaction=readSignedTransactionFromFile(nameOfFile);
+    SignedTransaction completeTransaction=approveMultisigTransaction(account1,signedTransaction,multisigAddress);
+    submitTransactionToNetwork(completeTransaction);
+
+    //print out multisig Address balance and receiver address balance after transaction
+    Long multisigBalanceAfterTransaction=getAccountBalance(multisigAddress.toAddress(), algodClient);
+    long receiverBalanceAfterTransaction=getAccountBalance(new Address(receiverAddress),algodClient);
+    System.out.println("multisigBalanceAfterTransaction: "+multisigBalanceAfterTransaction);
+    System.out.println("receiverBalanceAfterTransaction: "+receiverBalanceAfterTransaction);
+    }
+
+    public static  Account createAccountWithMnemonic(String mnemonic){
+        Account myAccount1= null;
+        try {
+            myAccount1 = new Account(mnemonic);
+            System.out.println(" algod account address: " + myAccount1.getAddress());
+            System.out.println(" algod account MNEMONIC: " + myAccount1.toMnemonic());
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            System.out.println(" Eror while creating new account "+e);
+        } catch (GeneralSecurityException e) {
+            e.printStackTrace();
+        }
+        return  myAccount1;
+    }
+
+    public static   Long getAccountBalance(Address address,AlgodClient algodClient) {
+        String[] headers = {"X-API-Key"};
+        String[] values = {PURESTAKE_API_KEY};
+        com.algorand.algosdk.v2.client.model.Account accountInfo = null;
+        try {
+            accountInfo = algodClient.AccountInformation(address).execute(headers,values).body();
+            System.out.println("Account Balance: "+ accountInfo.amount+" microAlgos");
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            e.printStackTrace();
+        }
+
+        return  accountInfo.amount;
+    }
+
+    public static AlgodClient createClientFromHackathonInstance(String HACKATHON_API_ADDRESS,int HACKATHON_API_PORT,String HACKATHON_API_TOKEN){
+        algodClient = (AlgodClient) new AlgodClient(HACKATHON_API_ADDRESS,
+                HACKATHON_API_PORT, HACKATHON_API_TOKEN);
+        try {
+            Strings[] headers = {"X-API-Key"};
+            Strings[] values = {HACKATHON_API_TOKEN};
+            NodeStatusResponse status = algodClient.GetStatus().execute(headers, values).body();
+            System.out.println("algod last round: " + status.lastRound);
+        } catch (Exception e) {
+            System.err.print("Failed to get algod status: " + e.getMessage());
+        }
+        return algodClient;
+    }
+
+
+    public static Ed25519PublicKey createEd25519PublicKeys(Address address){
+        byte[] b = new byte[0];
+        byte[] raw = new byte[32];
+        try {
+            b = address.toVerifyKey().getEncoded();
+        } catch (InvalidKeySpecException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        if (b.length != 44) {
+            throw new RuntimeException("Generated public key and X.509 prefix is the wrong size");
+        } else {
+            System.arraycopy(b, 12, raw, 0, 32);
+        }
+        return  new Ed25519PublicKey(raw);
+    }
+
+    public static MultisigAddress createMultiSigAddress(int version,int threshold,List<Ed25519PublicKey> ed25519PublicKeys){
+
+        MultisigAddress msig = new MultisigAddress(version, threshold, ed25519PublicKeys);
+        try {
+            System.out.println(msig.toAddress());
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return  msig;
+    }
+
+    public static SignedTransaction createAMultiSigTransaction(Account account, Transaction transaction,MultisigAddress msig){
+        SignedTransaction signedTransaction=null;
+        PendingTransactionResponse pendingTransactionResponse;
+        try {
+            signedTransaction = account.signMultisigTransaction(msig, transaction);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return  signedTransaction;
+    }
+    public static Transaction createTransaction(Account senderAccount,String receiverAdddress,String note,int valueToSend,String senderAddress){
+        TransactionParametersResponse transactionParametersResponse;
+        Transaction transaction=null;
+        PendingTransactionResponse pendingTransactionResponse;
+        try {
+            transactionParametersResponse = algodClient.TransactionParams().execute().body();
+            transaction= Transaction.PaymentTransactionBuilder().sender(senderAddress)
+                    .amount(valueToSend).receiver(new Address(receiverAdddress)).note(note.getBytes()).suggestedParams(transactionParametersResponse).build();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return transaction;
+    }
+    public static SignedTransaction approveMultisigTransaction(Account account, SignedTransaction transaction,MultisigAddress msig) {
+        SignedTransaction signedTransaction=null;
+        PendingTransactionResponse pendingTransactionResponse;
+        try {
+            signedTransaction = account.appendMultisigTransaction(msig, transaction);
+        }  catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (NullPointerException e){
+            e.printStackTrace();
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+        return signedTransaction;
+    }
+
+    public static void waitForConfirmation(String txID) throws Exception {
+        Long lastRound = algodClient.GetStatus().execute().body().lastRound;
+        while (true) {
+            try {
+                // Check the pending tranactions
+                Response<PendingTransactionResponse> pendingInfo = algodClient.PendingTransactionInformation(txID).execute();
+                if (pendingInfo.body().confirmedRound != null && pendingInfo.body().confirmedRound > 0) {
+                    // Got the completed Transaction
+                    System.out.println("Transaction " + txID + " confirmed in round " + pendingInfo.body().confirmedRound);
+                    break;
+                }
+                lastRound++;
+                algodClient.WaitForBlock(lastRound).execute();
+            } catch (Exception e) {
+                throw (e);
+            }
+        }
+
+
+    }
+
+    public  static  void  submitTransactionToNetwork(SignedTransaction signedTransaction) throws Exception {
+        PendingTransactionResponse pendingTransactionResponse=null;
+        byte[] encodedTxBytes = new byte[0];
+        encodedTxBytes = Encoder.encodeToMsgPack(signedTransaction);
+        String id=  algodClient.RawTransaction().rawtxn(encodedTxBytes).execute().body().txId;
+        waitForConfirmation(id);
+        pendingTransactionResponse = algodClient.PendingTransactionInformation(id).execute().body();
+        System.out.println("Transaction information (with notes): " + pendingTransactionResponse.toString());
+    }
+
+    public static void writeSignedTransactionToFile(String nameOfFile,SignedTransaction signedTransaction) throws IOException {
+        Gson gson=new Gson();
+        String jsonString=gson.toJson(signedTransaction);
+        FileWriter fileWriter=null;
+        File file=new File(nameOfFile);
+        if(file.createNewFile()){
+            fileWriter=new FileWriter(nameOfFile);
+            fileWriter.write(jsonString);
+            fileWriter.close();
+        }
+    }
+
+    public static  SignedTransaction  readSignedTransactionFromFile(String nameOfFile) throws FileNotFoundException {
+        File file=new File(nameOfFile);
+        Scanner scanner=new Scanner(file);
+        String data="";
+        while (scanner.hasNextLine()){
+            data=scanner.nextLine();
+         }
+        Gson gson=new Gson();
+        SignedTransaction signedTransaction=gson.fromJson(data,SignedTransaction.class);
+        return signedTransaction;
+    }
+}
