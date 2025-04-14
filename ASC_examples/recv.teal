@@ -1,0 +1,9 @@
+#pragma version 4
+
+txn Receiver
+addr GH34BOEWKPYBRXBKBMEXJABMWPXWVPCAE77FRONUYWHEMBABHGU6OXZFZM
+==
+txn Amount
+int 10000000 //10 Algos
+<=
+&&

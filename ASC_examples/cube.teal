@@ -1,0 +1,8 @@
+arg_0
+btoi
+dup
+dup
+*
+*
+int 27
+==
